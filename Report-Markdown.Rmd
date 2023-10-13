@@ -1,0 +1,68 @@
+---
+title: "Project 1"
+author: "Lachlan MacLean, Misha Tseitlin, Liam Gerrity"
+date: "29/01/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Here is a very basic skeleton guide to give a sense of what I expect from the assignment. Hopefully this helps. Not sure how much rmarkdown you have been exposed to, but in case you wanted to (learn to) use it, here you go. This pdf is generated from the code I sent, but changing the output in the first few lines to html_document will produce an html file. You can submit pdf, html, or word to moodle and you definitely don't have to use markdown (although it allows you to embed code and therefore avoids having to submit multiple files). Please ask if you aren't sure.
+
+Okay, below would be a perfectly acceptable way to approach the assignment. I like emphasizing the importance of sharing and annotating code. So I hope this is a practice you can adopt. It won't affect your grade, but I do need to be able to follow along so I can see what you did if things dont quite look right. 
+
+Equations may be the challenging part. To write an in-line equation or mathematical symbol, you us single dollar signs ($\sigma$) and an equation on its own line requires double dollar signs:
+
+$$y = \alpha_0 + \alpha_1X$$
+
+Use Teams to share issues tips and trick if you like, I will keep an eye on it.
+
+Formatting wise, feel free to format as you like. I have sprinkled different markdown code in the document so you have examples of how to carry out basic formatting.
+
+I dont want creating the markdown document to become the challenge, so I emphasize: 
+
+1. word or latex is fine
+2. help each other out
+3. ask me if there is something wrong
+
+
+## Question 1
+
+- **identify appropriate distributions for the stochastic components of the model (a few sentences: what and why)**
+
+One appropriate distribution for the stochastic part of the model is X because X. 
+
+- *write an R script to simulate dynamics from this model*
+
+```{r, eval=FALSE}
+#annotation is good practice
+#here you can embed your script
+
+```
+
+- simulate and plot 25 years of age-specific population dynamics and observation
+
+```{r, fig.height=3,fig.width=3,fig.align='center'}
+#R code to produce a plot, which will show in the doc
+#alternatively, past the figure into the document
+X <- rnorm(100,10,3)
+hist(X)
+```
+
+## Question 2
+
+- if illegal harvesting occurred before growth, the model would be:
+
+$$N_t|N_{t-1} = X$$
+
+
+- does it make more sense to model $r_t$ as a function of rainfall in time $t$ or time $t-1$? (neither is wrong, focus on interpreting the biological sequencing implied by the model)
+
+A few sentences here. What is your choice, and why. I would make sense to model X as a function of X because X. 
+
+- does it make more sense to model $K_t$ as a function of rainfall in time $t$ or time $t-1$? (again, neither is wrong)
+
+A few sentences here. What is your choice, and why. I would make sense to model X as a function of X because X. 
+
