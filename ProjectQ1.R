@@ -17,6 +17,7 @@ set.seed(576711)
 # n0 = initial populations
 # phi = survival probabilities
 # rho = reproduction rates
+# p = probability of detection
 # nyears = number of years over which population is projected
 # PROCESS : 
 # calculate the stochastic population dynamics and observations for each year
@@ -24,7 +25,7 @@ set.seed(576711)
 # y = array of observations for each year, across all age classes
 # n = array of abundances for each year, across all age classes
 
-BAS_stoch <- function(n0, phi, rho, cv, nyears) {
+BAS_stoch <- function(n0, phi, rho, p, nyears) {
   
   # initialise
   
@@ -39,15 +40,11 @@ BAS_stoch <- function(n0, phi, rho, cv, nyears) {
   n[,1] <- n0
   
   # initial observation
-  # set up log normal
-  m <- n[,1]
-  s <- m*cv
-  sig2 <- log(cv^2+1) # initial log variance
-  mu <- log(m) - sig2/2 # initial log mean
-  y[1,1] <- rlnorm(n = 1, meanlog = mu[1], sd = sqrt(sig2))
-  y[2,1] <- rlnorm(n = 1, meanlog = mu[2], sd = sqrt(sig2))
-  y[3,1] <- rlnorm(n = 1, meanlog = mu[3], sd = sqrt(sig2))
-  y[4,1] <- rlnorm(n = 1, meanlog = mu[4], sd = sqrt(sig2))
+  # ASSUMPTION: binomial distribution as constant probability of detection (see Newman)
+  y[1,1] <- rbinom(n = 1, size = n[1,1], prob = p)
+  y[2,1] <- rbinom(n = 1, size = n[2,1], prob = p)
+  y[3,1] <- rbinom(n = 1, size = n[3,1], prob = p)
+  y[4,1] <- rbinom(n = 1, size = n[4,1], prob = p)
   
   # loop over all (other) years
   for (i in 2:(nyears+1)) {
@@ -77,14 +74,10 @@ BAS_stoch <- function(n0, phi, rho, cv, nyears) {
     n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
     
     # new observations
-    m <- n[,i]
-    s <- m*cv
-    sig2 <- log(cv^2+1) # log variance
-    mu <- log(m) - sig2/2 # log mean
-    y[1,i] <- rlnorm(n = 1, meanlog = mu[1], sd = sqrt(sig2))
-    y[2,i] <- rlnorm(n = 1, meanlog = mu[2], sd = sqrt(sig2))
-    y[3,i] <- rlnorm(n = 1, meanlog = mu[3], sd = sqrt(sig2))
-    y[4,i] <- rlnorm(n = 1, meanlog = mu[4], sd = sqrt(sig2))
+    y[1,i] <- rbinom(n = 1, size = n[1,i-1], prob = p)
+    y[2,i] <- rbinom(n = 1, size = n[2,i-1], prob = p)
+    y[3,i] <- rbinom(n = 1, size = n[3,i-1], prob = p)
+    y[4,i] <- rbinom(n = 1, size = n[4,i-1], prob = p)
   }
   
   # return
@@ -95,7 +88,7 @@ BAS_stoch <- function(n0, phi, rho, cv, nyears) {
 # parameters from specification
 phi <- c(0.45, 0.7, 0.7)
 rho <- c(0.9, 1.9)
-cv <- 0.5 # ASSUMPTION: cv is the same as probability of detection.
+p <- 0.5
 n0 <- c(150, 70, 50, 30)
 
 # b)
@@ -107,7 +100,7 @@ n0 <- c(150, 70, 50, 30)
 nyears <- 25
 
 # run function for 25 years
-BAS_proj <- BAS_stoch(n0 = n0, phi = phi, rho = rho, cv = cv, nyears = nyears)
+BAS_proj <- BAS_stoch(n0 = n0, phi = phi, rho = rho, p = p, nyears = nyears)
 
 # visualise the data using a faceted ggplot.
 
