@@ -91,7 +91,7 @@ rho <- c(0.9, 1.9)
 p <- 0.5
 n0 <- c(150, 70, 50, 30)
 
-# b)
+# c)
 
 # Simulate 25 years of age-specific population dynamics and observations and 
 # produce an informative visualisation of the data.
