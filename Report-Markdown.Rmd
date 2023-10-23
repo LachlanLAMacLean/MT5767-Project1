@@ -1,7 +1,7 @@
 ---
-title: "Project 1"
+title: "MT5767 Project 1"
 author: "Lachlan MacLean, Misha Tseitlin, Liam Gerrity"
-date: "29/01/2021"
+date: "23/10/2023"
 output: pdf_document
 ---
 
@@ -9,60 +9,169 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Here is a very basic skeleton guide to give a sense of what I expect from the assignment. Hopefully this helps. Not sure how much rmarkdown you have been exposed to, but in case you wanted to (learn to) use it, here you go. This pdf is generated from the code I sent, but changing the output in the first few lines to html_document will produce an html file. You can submit pdf, html, or word to moodle and you definitely don't have to use markdown (although it allows you to embed code and therefore avoids having to submit multiple files). Please ask if you aren't sure.
+# Question 1
 
-Okay, below would be a perfectly acceptable way to approach the assignment. I like emphasizing the importance of sharing and annotating code. So I hope this is a practice you can adopt. It won't affect your grade, but I do need to be able to follow along so I can see what you did if things dont quite look right. 
+``` {r load and set, include = FALSE}
 
-Equations may be the challenging part. To write an in-line equation or mathematical symbol, you us single dollar signs ($\sigma$) and an equation on its own line requires double dollar signs:
+# Load relevant libraries
+library(tidyverse)
 
-$$y = \alpha_0 + \alpha_1X$$
-
-Use Teams to share issues tips and trick if you like, I will keep an eye on it.
-
-Formatting wise, feel free to format as you like. I have sprinkled different markdown code in the document so you have examples of how to carry out basic formatting.
-
-I dont want creating the markdown document to become the challenge, so I emphasize: 
-
-1. word or latex is fine
-2. help each other out
-3. ask me if there is something wrong
-
-
-## Question 1
-
-- **identify appropriate distributions for the stochastic components of the model (a few sentences: what and why)**
-
-One appropriate distribution for the stochastic part of the model is X because X. 
-
-- *write an R script to simulate dynamics from this model*
-
-```{r, eval=FALSE}
-#annotation is good practice
-#here you can embed your script
+# Set seed for reproducibility
+set.seed(576711)
 
 ```
 
-- simulate and plot 25 years of age-specific population dynamics and observation
+## Part a)
 
-```{r, fig.height=3,fig.width=3,fig.align='center'}
-#R code to produce a plot, which will show in the doc
-#alternatively, past the figure into the document
-X <- rnorm(100,10,3)
-hist(X)
+For this BAS model, we first look at the potential for stochastic components modelling the sub-process abundances. For survival, we use a binomial distribution to model this sub-process abundance for the first three age classes, with parameters $n_{i,t-1}$ and $\phi_i$  for $i = 1,2,3$, respectively. The last age class abundance for this sub-process is deterministically 0, as we are told that: “Fourth year individuals always die”. Next we look at the ageing sub-process. As all animals must necessarily age between time periods (years), we know this must be a deterministic process where all individuals from the previous sub-process for each age class move into to age class above, with the final fourth year individuals staying in this absorbing state. However, this absorbing state is trivial as none of the fourth year individuals have survived into the time period. Finally for reproduction, we choose a Poisson distribution for the first sub-process age class, whilst keeping all other age classes deterministically the same as in the previous sub process. A Poisson distribution is chosen as we know one of the reproduction rates is greater than 1 ($\rho_3 = 1.9$) so a binomial distribution is not appropriate.
+
+The only other stochastic part of this model are the observations. Given we are told the probability of detection is a static $p = 0.5$ and that no double counting can occur, a binomial distribution for the observations of each age class seems appropriate. Here for time $t$, we use the abundance for class $i$ at time $t$, $n_{i,t}$, for the number of trials and $p = 0.5$ for the probability of success.
+
+## Part b)
+
+In this part we functionalise the theory from a) in order to simulate the dynamics of this model.
+
+```{r Q1b, eval = TRUE}
+
+# b)
+
+# Write an R script to simulate dynamics from this model.
+# we do this in a function.
+
+# INPUT : 
+# n0 = initial populations
+# phi = survival probabilities
+# rho = reproduction rates
+# p = probability of detection
+# nyears = number of years over which population is projected
+# PROCESS : 
+# calculate the stochastic population dynamics and observations for each year
+# OUTPUT :
+# y = array of observations for each year, across all age classes
+# n = array of abundances for each year, across all age classes
+
+BAS_stoch <- function(n0, phi, rho, p, nyears) {
+  
+  # initialise
+  
+  # matrix of all abundances, each column is a year, row is age class
+  n <- matrix(data = NA, nrow = length(n0), ncol = (nyears+1))
+  
+  # matrix of all observations
+  y <- n #replicate n
+  
+  # initial abundance
+  # let the first set of abundances (at t = 0) be the initial population size
+  n[,1] <- n0
+  
+  # initial observation
+  # ASSUMPTION: binomial distribution as constant probability of detection (see Newman)
+  y[1,1] <- rbinom(n = 1, size = n[1,1], prob = p)
+  y[2,1] <- rbinom(n = 1, size = n[2,1], prob = p)
+  y[3,1] <- rbinom(n = 1, size = n[3,1], prob = p)
+  y[4,1] <- rbinom(n = 1, size = n[4,1], prob = p)
+  
+  # loop over all (other) years
+  for (i in 2:(nyears+1)) {
+    
+    # calculate stochastic sub-processes for BAS model
+    
+    # Survival process
+    u_1s1t <- rbinom(n = 1, size = n[1,i-1], prob = phi[1])
+    u_1s2t <- rbinom(n = 1, size = n[2,i-1], prob = phi[2])
+    u_1s3t <- rbinom(n = 1, size = n[3,i-1], prob = phi[3])
+    u_1s4t <- 0
+    
+    # Ageing process
+    u_2a1t <- 0
+    u_2a2t <- u_1s1t
+    u_2a3t <- u_1s2t
+    u_2a4t <- u_1s3t + u_1s4t
+    
+    # Reproduction/Birth process
+    u_3b1t <- rpois(n = 1, lambda = rho[1] * u_2a2t) + 
+              rpois(n = 1, lambda = rho[2] * u_2a3t)
+    u_3b2t <- u_2a2t
+    u_3b3t <- u_2a3t
+    u_3b4t <- u_2a4t
+    
+    # new abundances
+    n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
+    
+    # new observations
+    y[1,i] <- rbinom(n = 1, size = n[1,i-1], prob = p)
+    y[2,i] <- rbinom(n = 1, size = n[2,i-1], prob = p)
+    y[3,i] <- rbinom(n = 1, size = n[3,i-1], prob = p)
+    y[4,i] <- rbinom(n = 1, size = n[4,i-1], prob = p)
+  }
+  
+  # return
+  return(list(n=n,y=y))
+  
+}
+
+# parameters from specification
+phi <- c(0.45, 0.7, 0.7)
+rho <- c(0.9, 1.9)
+p <- 0.5
+n0 <- c(150, 70, 50, 30)
+
 ```
 
-## Question 2
+## Part c)
 
-- if illegal harvesting occurred before growth, the model would be:
+Finally, we run the function over 25 years. Storing the values for the population dynamics and observations, we then convert this into an appropriate format. This data can then be used to produce clear visualisations in the form of line plots.
 
-$$N_t|N_{t-1} = X$$
+```{r Q1c, eval = TRUE}
 
+# c)
 
-- does it make more sense to model $r_t$ as a function of rainfall in time $t$ or time $t-1$? (neither is wrong, focus on interpreting the biological sequencing implied by the model)
+# Simulate 25 years of age-specific population dynamics and observations and 
+# produce an informative visualisation of the data.
 
-A few sentences here. What is your choice, and why. I would make sense to model X as a function of X because X. 
+# specify how many years to project over
+nyears <- 25
 
-- does it make more sense to model $K_t$ as a function of rainfall in time $t$ or time $t-1$? (again, neither is wrong)
+# run function for 25 years
+BAS_proj <- BAS_stoch(n0 = n0, phi = phi, rho = rho, p = p, nyears = nyears)
 
-A few sentences here. What is your choice, and why. I would make sense to model X as a function of X because X. 
+# visualise the data using a faceted ggplot.
 
+# convert both outputs to dataframes
+proj_n_df <- as.data.frame( cbind(0:nyears, t(BAS_proj$n), 
+                    rep(2,(nyears+1))) )
+proj_y_df <- as.data.frame( cbind(0:nyears, t(BAS_proj$y), 
+                    rep(1,(nyears+1))) )
+# rename
+colnames(proj_n_df) <- c("Year", "First Year", "Second Year", "Third Year", 
+                         "Fourth Year", "State")
+colnames(proj_y_df) <- c("Year", "First Year", "Second Year", "Third Year", 
+                         "Fourth Year", "State")
+# pivot longer
+proj_n_df_long <- pivot_longer(data = proj_n_df, 
+                               cols = c("First Year", "Second Year", 
+                                        "Third Year", "Fourth Year"))
+proj_y_df_long <- pivot_longer(data = proj_y_df, 
+                               cols = c("First Year",  "Second Year", 
+                                        "Third Year", "Fourth Year"))
+proj_df_long <- rbind(proj_n_df_long, proj_y_df_long)
+colnames(proj_df_long) <- c("Year", "State", "Age Class", "Abundance")
+
+# change variable types
+proj_df_long$State <- as.factor(proj_df_long$State)
+proj_df_long$`Age Class` <- as.factor(proj_df_long$`Age Class`)
+
+# Can now easily use faceted ggplot
+plot_BAS <- ggplot(data = proj_df_long, aes(x = Year, y = Abundance)) + 
+  geom_line(aes(colour = State), size = 1) +
+  scale_colour_manual("State", breaks = c(2, 1),
+                      values = c("blue", "grey"), 
+                      labels = c("Dynamics","Observations")) +
+  facet_wrap(~factor(`Age Class`, levels = c("First Year", "Second Year", 
+                                             "Third Year", "Fourth Year")), 
+             scales = "free_y") +
+  ylab("Abundance") +
+  ggtitle("Population Dynamics and Observations Projected over Time")
+plot_BAS
+
+```
