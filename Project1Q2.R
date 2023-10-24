@@ -1,3 +1,10 @@
+install.packages("remotes")
+library(remotes)
+remotes::install_github("chrissuthy/statsecol")
+library(statsecol)
+str(wildebeest)
+library(tidyverse)
+
 #here is a general solution that can be used to fit all 4 model
 rain_rK_nll <- function(pars, years, removals, Nhat, SEhat, rain, type="nll"){
   
