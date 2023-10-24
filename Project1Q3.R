@@ -66,6 +66,7 @@ r <- numeric(nrow(wildebeest))
 alpha_values[1,1] = beta0
 alpha_values[1,2] = beta1
 alpha_values[1,3] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
+BIC1 <- 2 * optimised_values$value + log(12) * (length(optimised_values$par))
 
 #first year
 N[1] <- N0
@@ -120,7 +121,7 @@ r <- numeric(nrow(wildebeest))
 alpha_values[2,1] = beta0
 alpha_values[2,2] = beta1
 alpha_values[2,3] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
-
+BIC2 <- 2 * optimised_values$value + log(12) * (length(optimised_values$par))
 
 
 #first year
@@ -209,6 +210,7 @@ N <- numeric(nrow(wildebeest))
 k <- numeric(nrow(wildebeest))
 
 beta_values[1,3] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
+BIC3 <- 2 * fit_rainK$value + log(12)*length(fit_rainK$par)
 
 #first year
 N[1] <- N0
@@ -259,6 +261,7 @@ beta_values[2,2] = beta1
 N <- numeric(nrow(wildebeest))
 k <- numeric(nrow(wildebeest))
 beta_values[2,3] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
+BIC4 <- 2 * fit_rainK$value + log(12)*length(fit_rainK$par)
 
 N[1] <- N0
 k[1] <- NA #1st K not in the model
