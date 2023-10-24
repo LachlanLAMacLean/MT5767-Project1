@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Question 1
 
-``` {r load and set, include = FALSE}
+```{r load and set, include = FALSE}
 
 # Load relevant libraries
 library(tidyverse)
@@ -31,7 +31,7 @@ set.seed(576711)
 
 ## Part a)
 
-For this BAS model, we first look at the potential for stochastic components modelling the sub-process abundances. For survival, we use a binomial distribution to model this sub-process abundance for the first three age classes, with parameters $n_{i,t-1}$ and $\phi_i$  for $i = 1,2,3$, respectively. The last age class abundance for this sub-process is deterministically 0, as we are told that: “Fourth year individuals always die”. Next we look at the ageing sub-process. As all animals must necessarily age between time periods (years), we know this must be a deterministic process where all individuals from the previous sub-process for each age class move into to age class above, with the final fourth year individuals staying in this absorbing state. However, this absorbing state is trivial as none of the fourth year individuals have survived into the time period. Finally for reproduction, we choose a Poisson distribution for the first sub-process age class, whilst keeping all other age classes deterministically the same as in the previous sub process. A Poisson distribution is chosen as we know one of the reproduction rates is greater than 1 ($\rho_3 = 1.9$) so a binomial distribution is not appropriate.
+For this BAS model, we first look at the potential for stochastic components modelling the sub-process abundances. For survival, we use a binomial distribution to model this sub-process abundance for the first three age classes, with parameters $n_{i,t-1}$ and $\phi_i$ for $i = 1,2,3$, respectively. The last age class abundance for this sub-process is deterministically 0, as we are told that: "Fourth year individuals always die". Next we look at the ageing sub-process. As all animals must necessarily age between time periods (years), we know this must be a deterministic process where all individuals from the previous sub-process for each age class move into to age class above, with the final fourth year individuals staying in this absorbing state. However, this absorbing state is trivial as none of the fourth year individuals have survived into the time period. Finally for reproduction, we choose a Poisson distribution for the first sub-process age class, whilst keeping all other age classes deterministically the same as in the previous sub process. A Poisson distribution is chosen as we know one of the reproduction rates is greater than 1 ($\rho_3 = 1.9$) so a binomial distribution is not appropriate.
 
 The only other stochastic part of this model are the observations. Given we are told the probability of detection is a static $p = 0.5$ and that no double counting can occur, a binomial distribution for the observations of each age class seems appropriate. Here for time $t$, we use the abundance for class $i$ at time $t$, $n_{i,t}$, for the number of trials and $p = 0.5$ for the probability of success.
 
@@ -184,10 +184,11 @@ plot_BAS
 
 ```
 
+------------------------------------------------------------------------
+
 ## Question 3
 
 Here we look to test the impact of time lag when calculating the growth rate, r, and carrying capacity K
-
 
 ```{r Q3a, eval = TRUE, include=FALSE}
 
@@ -333,16 +334,11 @@ plot2 <-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 
 ```
 
-## Plot of the model with r dependent on t and a lag of t-1
+## Plot of the model with r dependent on $R_t$ and $R_{t-1}$
 
 ```{r 3aplot, results='hide', echo=FALSE, warning=FALSE}
 grid.arrange(plot1, plot2, ncol = 2)
 ```
-
- 
-  
-   
-   
 
 ```{r Q3b, eval = TRUE, include=FALSE}
 
@@ -481,11 +477,13 @@ plot4 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 
 ```
 
-## Plot of the model with K dependent on t and a lag of t-1
+## Plot of the model with K dependent on $R_t$ and $R_{t-1}$
 
 ```{r 3bplot, results='hide', echo=FALSE, warning=FALSE}
 grid.arrange(plot3, plot4, ncol = 2)
 ```
+
+## A table of $\alpha_0$ and $\alpha_1$ values
 
 ```{r AIC table}
 kable(alpha_values)

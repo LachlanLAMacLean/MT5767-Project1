@@ -9,7 +9,7 @@ library(gridExtra)
 
 alpha_values <- data.frame(matrix(0, nrow = 3, ncol = 4))
 colnames(alpha_values ) = c('r ~ Rt', 'r ~ Rt-1', 'k ~ Rt', 'k ~ Rt-1')
-rownames(alpha_values )= c('alpha 1', 'alpha 2', 'AIC')
+rownames(alpha_values )= c('\u03B1 1' , '\u03B1 2', 'AIC')
 
 #---- rt ~ Rt ----
 rainr_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
