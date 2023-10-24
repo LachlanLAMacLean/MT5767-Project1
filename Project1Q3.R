@@ -7,9 +7,9 @@ install.packages("gridExtra")
 library(gridExtra)
 
 
-alpha_values <- data.frame(matrix(0, nrow = 3, ncol = 4))
-colnames(alpha_values ) = c('r ~ Rt', 'r ~ Rt-1', 'k ~ Rt', 'k ~ Rt-1')
-rownames(alpha_values )= c('\u03B1 1' , '\u03B1 2', 'AIC')
+alpha_values <- data.frame(matrix(0, nrow = 2, ncol = 3))
+rownames(alpha_values ) = c('r ~ Rt', 'r ~ Rt-1')
+colnames(alpha_values )= c('\u03B1 1' , '\u03B1 2', 'AIC')
 
 #---- rt ~ Rt ----
 rainr_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
@@ -64,8 +64,8 @@ N <- numeric(nrow(wildebeest))
 r <- numeric(nrow(wildebeest))
 
 alpha_values[1,1] = beta0
-alpha_values[2,1] = beta1
-alpha_values[3,1] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
+alpha_values[1,2] = beta1
+alpha_values[1,3] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
 
 #first year
 N[1] <- N0
@@ -89,7 +89,7 @@ plot1 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
-  labs(title = "Model with r dependent on R[t]") +
+  labs(title = expression("Model with r dependent on R"[t])) +
   theme_bw() +
   theme(aspect.ratio = 1)
 
@@ -117,9 +117,10 @@ k <- exp(optimised_values$par[4])
 N <- numeric(nrow(wildebeest))
 r <- numeric(nrow(wildebeest))
 
-alpha_values[1,2] = beta0
+alpha_values[2,1] = beta0
 alpha_values[2,2] = beta1
-alpha_values[3,2] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
+alpha_values[2,3] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
+
 
 
 #first year
@@ -150,6 +151,11 @@ plot2 <-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 
 grid.arrange(plot1, plot2, ncol = 2)
 #---- k ~ Rt ----
+
+beta_values <- data.frame(matrix(0, ncol = 3, nrow = 2))
+rownames(beta_values ) = c('k ~ Rt', 'k ~ Rt-1')
+colnames(beta_values )= c('\u03B2_0' , '\u03B2_1', 'AIC')
+
 rainK_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
   
   N0 <- exp(pars[1])
@@ -197,15 +203,12 @@ beta0 <- fit_rainK$par[3]
 beta1 <- fit_rainK$par[4]
 pars <- c(N0, r, beta0,beta1)
 
-alpha_values[1,3] = beta0
-alpha_values[2,3] = beta1
+beta_values[1,1] = beta0
+beta_values[1,2] = beta1
 N <- numeric(nrow(wildebeest))
 k <- numeric(nrow(wildebeest))
-#loglik <- rainK_t(pars, nrow(wildebeest), wildebeest$Catch,
-#                  wildebeest$Nhat, wildebeest$sehat,
-#                  wildebeest$rain, 't-1')
-#K_logist <- length(fit_rainK$par)
-alpha_values[3,3] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
+
+beta_values[1,3] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
 
 #first year
 N[1] <- N0
@@ -251,11 +254,11 @@ beta0 <- fit_rainK$par[3]
 beta1 <- fit_rainK$par[4]
 pars <- c(N0, r, beta0,beta1)
 
-alpha_values[1,4] = beta0
-alpha_values[2,4] = beta1
+beta_values[2,1] = beta0
+beta_values[2,2] = beta1
 N <- numeric(nrow(wildebeest))
 k <- numeric(nrow(wildebeest))
-alpha_values[3,4] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
+beta_values[2,3] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
 
 N[1] <- N0
 k[1] <- NA #1st K not in the model
@@ -285,4 +288,4 @@ plot4 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 
 grid.arrange(plot3, plot4, ncol = 2)
 
-print(alpha_values)
+print(beta_values)
