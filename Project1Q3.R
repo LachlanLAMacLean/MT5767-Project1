@@ -3,15 +3,19 @@ library(remotes)
 remotes::install_github("chrissuthy/statsecol")
 library(statsecol)
 str(wildebeest)
+install.packages("gridExtra")
+library(gridExtra)
+
 
 alpha_values <- data.frame(matrix(0, nrow = 3, ncol = 4))
 colnames(alpha_values ) = c('r ~ Rt', 'r ~ Rt-1', 'k ~ Rt', 'k ~ Rt-1')
 rownames(alpha_values )= c('alpha 1', 'alpha 2', 'AIC')
+
 #---- rt ~ Rt ----
 rainr_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
   N0 <- exp(pars[1])
-  beta0 <- pars[2]   #not transformed |
-  beta1 <- pars[3]   #not transformed |-> note extra parameter now
+  beta0 <- pars[2]   
+  beta1 <- pars[3]   
   k <- exp(pars[4])
   
   N <- numeric(years)
@@ -22,26 +26,25 @@ rainr_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
   #generate population dynamics:
   for(i in 2:years){
     if (t == 't-1'){
-      r[i] <- exp(beta0 + beta1*rain[(i-1)]) #link fn of the linear predictor 
+      r[i] <- exp(beta0 + beta1*rain[(i-1)]) 
     }
     else{
-      r[i] <- exp(beta0 + beta1*rain[i]) #link fn of the linear predictor 
+      r[i] <- exp(beta0 + beta1*rain[i])  
     }
     N[i] = N[i-1] + r[i] * N[i-1] * (1-N[i-1]/k) - removals[i-1]
   }
  
   negloglik <- -sum(dnorm(Nhat,N,SEhat, log=TRUE), na.rm=TRUE)
   
-  #return the negative log likelihood 
-  return(negloglik)
+  return(negloglik)   #return the negative log likelihood
 }
 
 N0 <- log(0.1)
-beta0 <-  log(1.5)   
+beta0 <- log(1.5)
 beta1 <-  0.2 
 k <- log(1.5)
-
 parsr <- c(N0,beta0,beta1,k)
+
 optimised_values <- optim(parsr, 
                    fn = rainr_t,
                    years = nrow(wildebeest), 
@@ -59,13 +62,10 @@ k <- exp(optimised_values$par[4])
 pars <- c(N0,beta0,beta1,k)
 N <- numeric(nrow(wildebeest))
 r <- numeric(nrow(wildebeest))
+
 alpha_values[1,1] = beta0
 alpha_values[2,1] = beta1
-loglik <- rainr_t(pars, nrow(wildebeest), wildebeest$Catch,
-                                   wildebeest$Nhat, wildebeest$sehat,
-                                   wildebeest$rain, 't')
-K_logist <- length(optimised_values$par)
-alpha_values[3,1] <- 2*loglik + 2*K_logist
+alpha_values[3,1] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
 
 #first year
 N[1] <- N0
@@ -84,22 +84,21 @@ tmp_wilde <- data.frame(Nhat = wildebeest$Nhat,
                         uci = wildebeest$uci)
 
 #plot the projections and the estimates
-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
+plot1 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_errorbar(aes(ymin=lci,ymax=uci), width=0, color="grey") +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
   labs(title = "Model with r dependent on R[t]") +
-  theme_bw()
-
-
-
-
-
-
-
+  theme_bw() +
+  theme(aspect.ratio = 1)
 
 #---- rt ~ Rt-1 ----
+N0 <- log(0.1)
+beta0 <- log(1.5)
+beta1 <-  0.2 
+k <- log(1.5)
+parsr <- c(N0,optimised_values$par[2],optimised_values$par[3],optimised_values$par[4])
 
 optimised_values <- optim(parsr, 
                           fn = rainr_t,
@@ -114,18 +113,14 @@ optimised_values <- optim(parsr,
 N0 <- exp(optimised_values$par[1])
 beta0 <- optimised_values$par[2]
 beta1 <- optimised_values$par[3]
-alpha_values[1,2] = beta0
-alpha_values[2,2] = beta1
 k <- exp(optimised_values$par[4])
 N <- numeric(nrow(wildebeest))
 r <- numeric(nrow(wildebeest))
-pars <- c(N0,beta0,beta1,k)
 
-loglik <- rainr_t(pars, nrow(wildebeest), wildebeest$Catch,
-                  wildebeest$Nhat, wildebeest$sehat,
-                  wildebeest$rain, 't-1')
-K_logist <- length(optimised_values$par)
-alpha_values[3,2] <- 2*loglik + 2*K_logist
+alpha_values[1,2] = beta0
+alpha_values[2,2] = beta1
+alpha_values[3,2] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
+
 
 #first year
 N[1] <- N0
@@ -133,7 +128,7 @@ r[1] <- NA #1st K not in the model
 
 #subsequent years
 for(i in 2:nrow(wildebeest)){
-  r[i] <- exp(beta0 + beta1*wildebeest$rain[i])
+  r[i] <- exp(beta0 + beta1*wildebeest$rain[i-1])
   N[i] = N[i-1] + r[i] * N[i-1] * (1-N[i-1]/k) - wildebeest$Catch[i-1]
 }
 
@@ -144,16 +139,16 @@ tmp_wilde <- data.frame(Nhat = wildebeest$Nhat,
                         uci = wildebeest$uci)
 
 #plot the projections and the estimates
-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
+plot2 <-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_errorbar(aes(ymin=lci,ymax=uci), width=0, color="grey") +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
   labs(title = "Model with r dependent on R[t-1]") +
-  theme_bw()
+  theme_bw() +
+  theme(aspect.ratio = 1)
 
-
-
+grid.arrange(plot1, plot2, ncol = 2)
 #---- k ~ Rt ----
 rainK_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
   
@@ -173,9 +168,8 @@ rainK_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
     else{
       k[i] <- exp(beta0 + beta1*rain[i]) #link fn of the linear predictor 
     }
-    N[i] = N[i-1] + r * N[i-1] * (1-N[i-1]/k[i]) - removals[i-1]
+    N[i] = N[i-1] + (r * N[i-1] * (1-N[i-1]/k[i])) - removals[i-1]
   }
-  
   negloglik <- -sum(dnorm(Nhat,N,SEhat, log=TRUE), na.rm=TRUE)
   
   return(negloglik) 
@@ -183,8 +177,8 @@ rainK_t <- function(pars, years, removals, Nhat, SEhat, rain, t){
 
 N0 <- log(0.1)
 r <- log(0.25)
-beta0 <-  log(1.1)   
-beta1 <-  log(1.1)          
+beta0 <-  log(0.5)   
+beta1 <-  log(0.5)          
 
 parsk <- c(N0,r,beta0,beta1)
 fit_rainK <- optim(parsk,
@@ -207,11 +201,11 @@ alpha_values[1,3] = beta0
 alpha_values[2,3] = beta1
 N <- numeric(nrow(wildebeest))
 k <- numeric(nrow(wildebeest))
-loglik <- rainK_t(pars, nrow(wildebeest), wildebeest$Catch,
-                  wildebeest$Nhat, wildebeest$sehat,
-                  wildebeest$rain, 't-1')
-K_logist <- length(fit_rainK$par)
-alpha_values[3,3] <- 2*loglik + 2*K_logist
+#loglik <- rainK_t(pars, nrow(wildebeest), wildebeest$Catch,
+#                  wildebeest$Nhat, wildebeest$sehat,
+#                  wildebeest$rain, 't-1')
+#K_logist <- length(fit_rainK$par)
+alpha_values[3,3] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
 
 #first year
 N[1] <- N0
@@ -230,13 +224,14 @@ tmp_wilde <- data.frame(Nhat = wildebeest$Nhat,
                         uci = wildebeest$uci)
 
 #plot the projections and the estimates
-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
+plot3 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_errorbar(aes(ymin=lci,ymax=uci), width=0, color="grey") +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
   labs(title = "Model with k dependent on Rt") +
-  theme_bw()
+  theme_bw() +
+  theme(aspect.ratio = 1)
 
 #---- Kt ~ Rt-1 ----
 
@@ -260,11 +255,7 @@ alpha_values[1,4] = beta0
 alpha_values[2,4] = beta1
 N <- numeric(nrow(wildebeest))
 k <- numeric(nrow(wildebeest))
-loglik <- rainK_t(pars, nrow(wildebeest), wildebeest$Catch,
-                  wildebeest$Nhat, wildebeest$sehat,
-                  wildebeest$rain, 't-1')
-K_logist <- length(fit_rainK$par)
-alpha_values[3,4] <- 2*loglik + 2*K_logist
+alpha_values[3,4] <- 2 * fit_rainK$value + 2*length(fit_rainK$par)
 
 N[1] <- N0
 k[1] <- NA #1st K not in the model
@@ -282,10 +273,16 @@ tmp_wilde <- data.frame(Nhat = wildebeest$Nhat,
                         uci = wildebeest$uci)
 
 #plot the projections and the estimates
-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
+plot4 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_errorbar(aes(ymin=lci,ymax=uci), width=0, color="grey") +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
   labs(title = "Model with k dependent on Rt-1") +
-  theme_bw()
+  theme_bw()+
+  theme(aspect.ratio = 1)
+
+
+grid.arrange(plot3, plot4, ncol = 2)
+
+print(alpha_values)
