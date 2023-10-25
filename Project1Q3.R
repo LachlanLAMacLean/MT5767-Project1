@@ -292,3 +292,98 @@ plot4 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 grid.arrange(plot3, plot4, ncol = 2)
 
 print(beta_values)
+
+#----r & K ~ t-1 ----
+combined_values <- data.frame(matrix(0, nrow = 1, ncol = 6))
+rownames(combined_values ) = c('Values')
+colnames(combined_values )= c('ALPHA 0' , 'ALPHA 1','BETA 0', 'BETA 1', 'AIC', 'BIC')
+
+rainr_K_t <- function(pars, years, removals, Nhat, SEhat, rain){
+  N0 <- exp(pars[1])
+  alpha0 <- pars[2]   
+  alpha1 <- pars[3] 
+  beta0 <- pars[4]   
+  beta1 <- pars[5] 
+  
+  N <- numeric(years)
+  r <- numeric(years)
+  k <- numeric(years)
+  N[1] <- N0
+  r[1] <- NA 
+  k[1] <- NA
+  
+  #generate population dynamics:
+  for(i in 2:years){
+    r[i] <- exp(alpha0 + alpha1*rain[(i-1)]) 
+    k[i] <- exp(beta0 + beta1*rain[(i-1)])
+    N[i] = N[i-1] + r[i] * N[i-1] * (1-N[i-1]/k[i]) - removals[i-1]
+  }
+  
+  negloglik <- -sum(dnorm(Nhat,N,SEhat, log=TRUE), na.rm=TRUE)
+  
+  return(negloglik)   #return the negative log likelihood
+}
+
+N0 <- log(0.1)
+alpha0 <- log(0.5)
+alpha1 <-  log(0.5) 
+beta0 <-  log(0.5)   
+beta1 <-  log(0.5)
+parsr <- c(N0,alpha0, alpha1, beta0, beta1)
+
+optimised_values <- optim(parsr, 
+                          fn = rainr_K_t,
+                          years = nrow(wildebeest), 
+                          removals = wildebeest$Catch,
+                          Nhat = wildebeest$Nhat,
+                          SEhat = wildebeest$sehat,
+                          rain = wildebeest$rain)
+
+# set up parameters using the optimised values above
+N0 <- exp(optimised_values$par[1])
+alpha0 <- optimised_values$par[2]
+alpha1 <- optimised_values$par[3]
+beta0 <- optimised_values$par[4]
+beta1 <- optimised_values$par[5]
+pars <- c(N0,alpha0, alpha1, beta0,beta1,k)
+
+N <- numeric(nrow(wildebeest))
+r <- numeric(nrow(wildebeest))
+k <- numeric(nrow(wildebeest))
+
+combined_values[1,1] = alpha0
+combined_values[1,2] = alpha1
+combined_values[1,3] = beta0
+combined_values[1,4] = beta1
+combined_values[1,5] <- 2 * optimised_values$value + 2*(length(optimised_values$par))
+combined_values[1,6] <- 2 * optimised_values$value + log(12) * (length(optimised_values$par))
+
+#first year
+N[1] <- N0
+r[1] <- NA 
+k[1] <- NA
+
+#subsequent years
+for(i in 2:nrow(wildebeest)){
+  r[i] <- exp(alpha0 + alpha1*wildebeest$rain[(i-1)])
+  k[i] <- exp(beta0 + beta1*wildebeest$rain[(i-1)])
+  N[i] = N[i-1] + r[i] * N[i-1] * (1-N[i-1]/k[i]) - wildebeest$Catch[i-1]
+}
+
+tmp_wilde <- data.frame(Nhat = wildebeest$Nhat,
+                        Nproj = N,
+                        Year = wildebeest$year,
+                        lci = wildebeest$lci,
+                        uci = wildebeest$uci)
+
+#plot the projections and the estimates
+plot5 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
+  geom_errorbar(aes(ymin=lci,ymax=uci), width=0, color="grey") +
+  geom_point(aes(x=Year,y=Nhat), size=3) +
+  geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
+  ylim(0,2.1) + ylab("Abundance (millions)") +
+  labs(title = expression("Model with r dependent on R"[t])) +
+  theme_bw() +
+  theme(aspect.ratio = 1)
+
+plot5
