@@ -74,10 +74,10 @@ BAS_stoch <- function(n0, phi, rho, p, nyears) {
     n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
     
     # new observations
-    y[1,i] <- rbinom(n = 1, size = n[1,i-1], prob = p)
-    y[2,i] <- rbinom(n = 1, size = n[2,i-1], prob = p)
-    y[3,i] <- rbinom(n = 1, size = n[3,i-1], prob = p)
-    y[4,i] <- rbinom(n = 1, size = n[4,i-1], prob = p)
+    y[1,i] <- rbinom(n = 1, size = n[1,i], prob = p)
+    y[2,i] <- rbinom(n = 1, size = n[2,i], prob = p)
+    y[3,i] <- rbinom(n = 1, size = n[3,i], prob = p)
+    y[4,i] <- rbinom(n = 1, size = n[4,i], prob = p)
   }
   
   # return
@@ -161,7 +161,7 @@ plot_BAS
 #         las=1, type="l", pch=16, col = "blue")
 # }
 
-# Extension to part b0 and c)
+# Extension to part b) and c)
 
 # Create a new function like in b), but runs poisson instead of Binomial for 
 # observations
@@ -226,10 +226,10 @@ BAS_extension <- function(n0, phi, rho, p, nyears) {
     n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
     
     # new observations
-    y[1,i] <- rpois(n = 1, lambda = n[1,i-1]*p)
-    y[2,i] <- rpois(n = 1, lambda = n[2,i-1]*p)
-    y[3,i] <- rpois(n = 1, lambda = n[3,i-1]*p)
-    y[4,i] <- rpois(n = 1, lambda = n[4,i-1]*p)
+    y[1,i] <- rpois(n = 1, lambda = n[1,i]*p)
+    y[2,i] <- rpois(n = 1, lambda = n[2,i]*p)
+    y[3,i] <- rpois(n = 1, lambda = n[3,i]*p)
+    y[4,i] <- rpois(n = 1, lambda = n[4,i]*p)
   }
   
   # return
