@@ -198,9 +198,9 @@ $r = exp(\alpha_0 + \alpha_1R_t)$
 
 $r = exp(\alpha_0 + \alpha_1R_{t-1})$
 
-By finding the likelihood of the model and using an optimisation function, parameter values of $\alpha_0$ and $\alpha_1$ can be found to calculate $r$ for each time period. Each model can then be used to estimate N as shown by Figure ???. The AIC of each model is displayed in Table ??? and used for model comparison.
+By finding the likelihood of the model and using an optimisation function, parameter values of $\alpha_0$ and $\alpha_1$ can be found to calculate $r$ for each time period. Each model can then be used to estimate N as shown by Figure 3. The AIC of each model is displayed in Table 1 and used for model comparison.
 
-#   
+# 
 
 ```{r Q3a, eval = TRUE, include=FALSE}
 #First a dataframe will need to be created to store the optimal alpha values as well as the model comparison AIC and BIC values
@@ -361,13 +361,11 @@ plot2 <-ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 grid.arrange(plot1, plot2, ncol = 2)
 ```
 
-##   
-
 ```{r alpha_table, echo=FALSE}
-kable(alpha_values)
+kable(alpha_values, caption = "Coefficients and model comparisons for time varying r")
 ```
 
-By comparing AIC values, the first model $r = exp(\alpha_0 + \alpha_1R_t)$is preferabe as it produces the lowest AIC value.
+By comparing AIC values, the first model $r = exp(\alpha_0 + \alpha_1R_t)$is preferabe as it produces the lowest AIC value. Looking at the coefficent estimates we can see that $\alpha_0$ is equal to $-2.98$ which is negative. This will mean that the intercept of the r equation when there is no rainfall is less than 1. WHY / WHAT DOES THIS SHOW???. It is also shown for this optimal model that $\alpha_1 = 0.632$. This positive value shows that rainfall has a positive impact on the growth rate. To put this into context we can conclude that this model implies that as rainfall increases, the maximum growth rate will also increase causing a greater abundance estimate.
 
 ### Modelling $K$ dependent on $R_t$ and $R_{t-1}$
 
@@ -377,7 +375,7 @@ $K = exp(\beta_0 + \beta_1R_t)$
 
 $K = exp(\beta_0 + \beta_1R_{t-1})$
 
-Again through the use of optimisation, coefficient value for $\beta_0$ and $\beta_1$ were used to model estimates for $N$, plotted in Figure ???, alongside the respective AIC values displayed in table ???.
+Again through the use of optimisation, coefficient value for $\beta_0$ and $\beta_1$ were used to model estimates for $N$, plotted in Figure 3, alongside the respective AIC values displayed in table 2.
 
 ```{r Q3b, eval = TRUE, include=FALSE}
 
@@ -528,17 +526,15 @@ plot4 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 grid.arrange(plot3, plot4, ncol = 2)
 ```
 
-##   
-
 ```{r k AIC, echo=FALSE}
-kable(beta_values)
+kable(beta_values, caption = "Coefficients and model comparisons for time varying K")
 ```
 
-From comparing the AIC values of the competing models, the optimal choice appears to use $K$ as a function of $R_t$.
+From comparing the AIC values of the competing models in Table 2, the optimal choice appears to use $K$ as a function of $R_t$. Within this model $\beta_0 = -0.497$ and $\beta_1 = 1.02$. This positive value of $\beta_1$ implies that rain has a positive effect on the carrying capacity and so more rain will lead to a greater carrying capacity.
 
 ### The Optimal Model?
 
-By comparing the AIC scores of all 4 models, it would appear that the optimal model according to the lowest score is the one which uses K dependent on $R_t$.
+By comparing the AIC and BIC scores of all 4 models, it would appear that the optimal model according to the lowest score is the one which uses K dependent on $R_t$ followed by the dependence of $r$ on $R_t$.
 
 ## modelling both temporal $r$ and $K$
 
@@ -548,7 +544,7 @@ $r = exp(\alpha_0 + \alpha_1R_{t-1})$
 
 $K = exp(\beta_0 + \beta_1R_{t-1})$
 
-This arises to model fit displayed in Figure ???. Table??? displays the coefficient values for the equations above for the model in addition to those found in the optimal models using only a single non constant variable to allow for comparison.
+This arises to model fit displayed in Figure 4. Table 3 displays the coefficient values for the equations above for the model in addition to those found in the optimal models using only a single non constant variable to allow for comparison.
 
 ```{r Q3extra, eval = TRUE, include=FALSE}
 
@@ -638,7 +634,7 @@ plot5 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
-  labs(title = expression("Model with r dependent on R"[t])) +
+  labs(title = expression("Model with r and K dependent on R"[t])) +
   theme_bw() +
   theme(aspect.ratio = 1)
 
@@ -648,11 +644,10 @@ plot5 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
 grid.arrange(plot5, ncol = 1)
 ```
 
-##   
-
 ```{r r and K AIC, echo=FALSE}
-kable(combined_values)
+kable(combined_values, caption = "Coefficient and model comparison values")
 ```
-From Table ??? it can be seen that both the AIC and BIC for the final model are greater than the models using only a single variable dependent on Rainfall. This would suggest that there is no immediate benefit to using a more complex model utilising multiple non constant coefficients. 
 
-It can also be seen by comparison the coefficient values for the model with both $\alpha$ and $\beta$ appear to have a smaller magnitude than those of the models with only a single time varying variable.
+From Table 3 it can be seen that both the AIC and BIC for the final model are greater than the models using only a single variable dependent on Rainfall. This would suggest that there is no immediate benefit to using a more complex model utilising multiple non constant coefficients.
+
+It can also be seen by comparison the coefficient values for the model with both $\alpha_1$ and $\beta_1$ appear to have a smaller magnitude than those of the models with only a single time varying variable suggesting that compared to the individual models the impact of rainfall on each coeffiecient has been reduced. $\alpha_1$ has now also taken a negative value implying a negative relationship between the maximum growth rate and rainfall, contradicting the observations made previously in the model with on r displaying temporal variation.
