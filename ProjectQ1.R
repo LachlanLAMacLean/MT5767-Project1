@@ -153,14 +153,6 @@ plot_BAS <- ggplot(data = proj_df_long, aes(x = Year, y = Abundance)) +
   ggtitle("Population Dynamics and Observations Projected over Time")
 plot_BAS
 
-# # test
-# for (i in 1:4) {
-#   plot(0:nyears, BAS_proj$y[i,],ylab="Abundance",xlab="Years",
-#        las=1, type="l", pch=16, col = "grey")
-#   lines(0:nyears, BAS_proj$n[i,],ylab="Abundance",xlab="Years",
-#         las=1, type="l", pch=16, col = "blue")
-# }
-
 # Extension to part b) and c)
 
 # Create a new function like in b), but runs poisson instead of Binomial for 
@@ -295,3 +287,15 @@ plot_BAS_ext <- ggplot(data = proj_df_long, aes(x = Year, y = Abundance)) +
   ylab("Abundance") +
   ggtitle("Population Dynamics and Observations Projected over Time")
 plot_BAS_ext
+
+
+
+
+
+# # test
+# for (i in 1:4) {
+#   plot(0:nyears, BAS_proj$y[i,],ylab="Abundance",xlab="Years",
+#        las=1, type="l", pch=16, col = "grey")
+#   lines(0:nyears, BAS_proj$n[i,],ylab="Abundance",xlab="Years",
+#         las=1, type="l", pch=16, col = "blue")
+# }
