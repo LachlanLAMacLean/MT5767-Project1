@@ -9,10 +9,6 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This report is the joint product of all of the above mentioned members with each member producing the code, analysis and write up for separate questions. Question 1 was completed by LM, Question 2 by MT and Question 3 by LG.
-
-# Question 1
-
 ```{r load and set, include = FALSE}
 
 # Load relevant libraries
@@ -29,17 +25,19 @@ set.seed(576711)
 
 ```
 
-## Part a)
+# Contribution Statement
 
-For this BAS model, we first look at the potential for stochastic components modelling the sub-process abundances. For survival, we use a binomial distribution to model this sub-process abundance for the first three age classes, with parameters $n_{i,t-1}$ and $\phi_i$ for $i = 1,2,3$, respectively. The last age class abundance for this sub-process is deterministically 0, as we are told that: "Fourth year individuals always die". Next we look at the ageing sub-process. As all animals must necessarily age between time periods (years), we know this must be a deterministic process where all individuals from the previous sub-process for each age class move into to age class above, with the final fourth year individuals staying in this absorbing state. However, this absorbing state is trivial as none of the fourth year individuals have survived into the time period. Finally for reproduction, we choose a Poisson distribution for the first sub-process age class, whilst keeping all other age classes deterministically the same as in the previous sub process. A Poisson distribution is chosen as we know one of the reproduction rates is greater than 1 ($\rho_3 = 1.9$) so a binomial distribution is not appropriate.
+This report is the joint product of all of the above mentioned members with each member producing the code, analysis and write up for separate questions. Question 1 was completed by LM, Question 2 by MT and Question 3 by LG.
 
-The only other stochastic part of this model are the observations. Given we are told the probability of detection is a static $p = 0.5$ and that no double counting can occur, a binomial distribution for the observations of each age class seems appropriate. Here for time $t$, we use the abundance for class $i$ at time $t$, $n_{i,t}$, for the number of trials and $p = 0.5$ for the probability of success.
+------------------------------------------------------------------------
 
-## Part b)
+# Question 1
 
-In this part we functionalise the theory from a) in order to simulate the dynamics of this model.
+```{r Q1 code, include = FALSE}
 
-```{r Q1b, eval = TRUE}
+# a)
+
+# See written report
 
 # b)
 
@@ -107,10 +105,10 @@ BAS_stoch <- function(n0, phi, rho, p, nyears) {
     n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
     
     # new observations
-    y[1,i] <- rbinom(n = 1, size = n[1,i-1], prob = p)
-    y[2,i] <- rbinom(n = 1, size = n[2,i-1], prob = p)
-    y[3,i] <- rbinom(n = 1, size = n[3,i-1], prob = p)
-    y[4,i] <- rbinom(n = 1, size = n[4,i-1], prob = p)
+    y[1,i] <- rbinom(n = 1, size = n[1,i], prob = p)
+    y[2,i] <- rbinom(n = 1, size = n[2,i], prob = p)
+    y[3,i] <- rbinom(n = 1, size = n[3,i], prob = p)
+    y[4,i] <- rbinom(n = 1, size = n[4,i], prob = p)
   }
   
   # return
@@ -123,14 +121,6 @@ phi <- c(0.45, 0.7, 0.7)
 rho <- c(0.9, 1.9)
 p <- 0.5
 n0 <- c(150, 70, 50, 30)
-
-```
-
-## Part c)
-
-Finally, we run the function over 25 years. Storing the values for the population dynamics and observations, we then convert this into an appropriate format. This data can then be used to produce clear visualisations in the form of line plots.
-
-```{r Q1c, eval = TRUE, fig.cap='INSERT TITLE HERE'}
 
 # c)
 
@@ -150,18 +140,28 @@ proj_n_df <- as.data.frame( cbind(0:nyears, t(BAS_proj$n),
                     rep(2,(nyears+1))) )
 proj_y_df <- as.data.frame( cbind(0:nyears, t(BAS_proj$y), 
                     rep(1,(nyears+1))) )
+
 # rename
-colnames(proj_n_df) <- c("Year", "First Year", "Second Year", "Third Year", 
-                         "Fourth Year", "State")
-colnames(proj_y_df) <- c("Year", "First Year", "Second Year", "Third Year", 
-                         "Fourth Year", "State")
+colnames(proj_n_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+colnames(proj_y_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+
 # pivot longer
 proj_n_df_long <- pivot_longer(data = proj_n_df, 
-                               cols = c("First Year", "Second Year", 
-                                        "Third Year", "Fourth Year"))
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
 proj_y_df_long <- pivot_longer(data = proj_y_df, 
-                               cols = c("First Year",  "Second Year", 
-                                        "Third Year", "Fourth Year"))
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
 proj_df_long <- rbind(proj_n_df_long, proj_y_df_long)
 colnames(proj_df_long) <- c("Year", "State", "Age Class", "Abundance")
 
@@ -175,22 +175,195 @@ plot_BAS <- ggplot(data = proj_df_long, aes(x = Year, y = Abundance)) +
   scale_colour_manual("State", breaks = c(2, 1),
                       values = c("blue", "grey"), 
                       labels = c("Dynamics","Observations")) +
-  facet_wrap(~factor(`Age Class`, levels = c("First Year", "Second Year", 
-                                             "Third Year", "Fourth Year")), 
+  facet_wrap(~factor(`Age Class`, levels = c("First Year Individuals", 
+                                             "Second Year Individuals", 
+                                             "Third Year Individuals", 
+                                             "Fourth Year Individuals")), 
              scales = "free_y") +
   ylab("Abundance") +
   ggtitle("Population Dynamics and Observations Projected over Time")
 plot_BAS
 
+# Extension to part b) and c)
+
+# Create a new function like in b), but runs poisson instead of Binomial for 
+# observations
+
+# INPUT : 
+# n0 = initial populations
+# phi = survival probabilities
+# rho = reproduction rates
+# p = probability of detection
+# nyears = number of years over which population is projected
+# PROCESS : 
+# calculate the stochastic population dynamics and observations for each year
+# OUTPUT :
+# y = array of observations for each year, across all age classes
+# n = array of abundances for each year, across all age classes
+
+BAS_extension <- function(n0, phi, rho, p, nyears) {
+  
+  # initialise
+  
+  # matrix of all abundances, each column is a year, row is age class
+  n <- matrix(data = NA, nrow = length(n0), ncol = (nyears+1))
+  
+  # matrix of all observations
+  y <- n #replicate n
+  
+  # initial abundance
+  # let the first set of abundances (at t = 0) be the initial population size
+  n[,1] <- n0
+  
+  # initial observation
+  y[1,1] <- rpois(n = 1, lambda = n[1,1]*p)
+  y[2,1] <- rpois(n = 1, lambda = n[2,1]*p)
+  y[3,1] <- rpois(n = 1, lambda = n[3,1]*p)
+  y[4,1] <- rpois(n = 1, lambda = n[4,1]*p)
+  
+  # loop over all (other) years
+  for (i in 2:(nyears+1)) {
+    
+    # calculate stochastic sub-processes for BAS model
+    
+    # Survival process
+    u_1s1t <- rbinom(n = 1, size = n[1,i-1], prob = phi[1])
+    u_1s2t <- rbinom(n = 1, size = n[2,i-1], prob = phi[2])
+    u_1s3t <- rbinom(n = 1, size = n[3,i-1], prob = phi[3])
+    u_1s4t <- 0
+    
+    # Ageing process
+    u_2a1t <- 0
+    u_2a2t <- u_1s1t
+    u_2a3t <- u_1s2t
+    u_2a4t <- u_1s3t + u_1s4t
+    
+    # Reproduction/Birth process
+    u_3b1t <- rpois(n = 1, lambda = rho[1] * u_2a2t) + 
+      rpois(n = 1, lambda = rho[2] * u_2a3t)
+    u_3b2t <- u_2a2t
+    u_3b3t <- u_2a3t
+    u_3b4t <- u_2a4t
+    
+    # new abundances
+    n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
+    
+    # new observations
+    y[1,i] <- rpois(n = 1, lambda = n[1,i]*p)
+    y[2,i] <- rpois(n = 1, lambda = n[2,i]*p)
+    y[3,i] <- rpois(n = 1, lambda = n[3,i]*p)
+    y[4,i] <- rpois(n = 1, lambda = n[4,i]*p)
+  }
+  
+  # return
+  return(list(n=n,y=y))
+  
+}
+
+# Simulate 25 years of age-specific population dynamics and observations and 
+# produce an informative visualisation of the data.
+
+# run function for 25 years
+# use same parameter values as above
+BAS_proj_ext <- BAS_extension(n0 = n0, phi = phi, rho = rho, p = p, 
+                              nyears = nyears)
+
+# visualise the data using a faceted ggplot.
+
+# convert both outputs to dataframes
+proj_n_df <- as.data.frame( cbind(0:nyears, t(BAS_proj_ext$n), 
+                                  rep(2,(nyears+1))) )
+proj_y_df <- as.data.frame( cbind(0:nyears, t(BAS_proj_ext$y), 
+                                  rep(1,(nyears+1))) )
+
+# rename
+colnames(proj_n_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+colnames(proj_y_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+
+# pivot longer
+proj_n_df_long <- pivot_longer(data = proj_n_df, 
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
+proj_y_df_long <- pivot_longer(data = proj_y_df, 
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
+proj_df_long <- rbind(proj_n_df_long, proj_y_df_long)
+colnames(proj_df_long) <- c("Year", "State", "Age Class", "Abundance")
+
+# change variable types
+proj_df_long$State <- as.factor(proj_df_long$State)
+proj_df_long$`Age Class` <- as.factor(proj_df_long$`Age Class`)
+
+# Can now easily use faceted ggplot
+plot_BAS_ext <- ggplot(data = proj_df_long, aes(x = Year, y = Abundance)) + 
+  geom_line(aes(colour = State), size = 1) +
+  scale_colour_manual("State", breaks = c(2, 1),
+                      values = c("blue", "grey"), 
+                      labels = c("Dynamics","Observations")) +
+  facet_wrap(~factor(`Age Class`, levels = c("First Year Individuals", 
+                                             "Second Year Individuals", 
+                                             "Third Year Individuals", 
+                                             "Fourth Year Individuals")), 
+             scales = "free_y") +
+  ylab("Abundance") +
+  ggtitle("Population Dynamics and Observations Projected over Time")
+plot_BAS_ext
+
+```
+
+## Part a)
+
+Given this BAS model, we first look at the potential for stochastic components modelling the sub-process abundances. For survival, we use a binomial distribution to model this sub-process abundance in the first three age classes, with parameters $n_{i,t-1}$ and $\phi_i$ for $i = 1,2,3$, respectively. The last age class abundance for this sub-process is deterministically 0, as we are told that: "Fourth year individuals always die". Next we look at the ageing sub-process. As all animals must necessarily age between time periods (years), we know this must be a deterministic process where all individuals from the previous sub-process for each age class move into to the next age class. We know the final fourth year individuals all die during the year (as per the previous sub-process) and thus do not move to a higher age class. Finally for reproduction, we choose a Poisson distribution for the first sub-process age class, whilst keeping all other age classes the same as in the previous sub process. A Poisson distribution is chosen as we know one of the reproduction rates is greater than 1 ($\rho_3 = 1.9$) so a binomial distribution is not appropriate.
+
+
+The other stochastic component of this model are the observations. Given we are told the probability of detection is a static $p = 0.5$ and that no double counting can occur, a binomial distribution for the observations of each age class seems appropriate. Here for time $t$, we use the abundance for class $i$ at time $t$, $n_{i,t}$, for the number of trials and $p = 0.5$ for the probability of success.
+
+## Part b)
+
+In this part we functionalise the theory from a) in order to simulate the dynamics of this model. This code is visible in the appendix.
+
+## Part c)
+
+Finally, we run the function, projecting the animal abundance over 25 years. Storing the values for the population dynamics and observations, we then convert this into an appropriate format. This data can then be used to produce clear visualisations in the form of line plots.
+
+```{r Q1c, eval = TRUE, fig.cap = 'Population dynamics and observations over time given a binomial distribution for the observations', echo = FALSE}
+
+plot_BAS
+
+```
+
+## Extension
+
+**This is beyond the scope of the assignment.**
+Here, we look at differences when changing the observation distribution. Before, we chose a binomial distribution, we now change this to a poisson distribution for the observation of each age class, as the specification does allow for this type of distribution to be used. The rate parameter for each age class $i$ at time $t$ is $\lambda = n_{i,t} \cdot p$. Otherwise providing this function the same values as above, we produce another visualisation. 
+
+``` {r Q1ext, eval = TRUE, fig.cap = 'Population dynamics and observations over time given a binomial distribution for the observations', echo = FALSE}
+
+plot_BAS_ext
+
 ```
 
 ------------------------------------------------------------------------
 
-## Question 3
+# Question 2
+
+------------------------------------------------------------------------
+
+# Question 3
 
 We will fit models to the data using values for growth rate, $r$, and carrying capacity, $K$, dependent on the recorded rainfall, $R,$ according to the data set. We will then look to test the impact of time lag when fitting models to the observed data by finding the coefficients of $r$ and $K$ with respect to $R_t$ and $R_{t-1}$.
 
-### modelling $r$ dependent on $R_t$ and $R_{t-1}$
+## modelling $r$ dependent on $R_t$ and $R_{t-1}$
 
 The previously used model has now been extended to include temporal variation in $r$:
 
@@ -199,8 +372,6 @@ $r = exp(\alpha_0 + \alpha_1R_t)$
 $r = exp(\alpha_0 + \alpha_1R_{t-1})$
 
 By finding the likelihood of the model and using an optimisation function, parameter values of $\alpha_0$ and $\alpha_1$ can be found to calculate $r$ for each time period. Each model can then be used to estimate N as shown by Figure 3. The AIC of each model is displayed in Table 1 and used for model comparison.
-
-# 
 
 ```{r Q3a, eval = TRUE, include=FALSE}
 #First a dataframe will need to be created to store the optimal alpha values as well as the model comparison AIC and BIC values
@@ -367,7 +538,7 @@ kable(alpha_values, caption = "Coefficients and model comparisons for time varyi
 
 By comparing AIC values, the first model $r = exp(\alpha_0 + \alpha_1R_t)$is preferabe as it produces the lowest AIC value. Looking at the coefficent estimates we can see that $\alpha_0$ is equal to $-2.98$ which is negative. This will mean that the intercept of the r equation when there is no rainfall is less than 1. WHY / WHAT DOES THIS SHOW???. It is also shown for this optimal model that $\alpha_1 = 0.632$. This positive value shows that rainfall has a positive impact on the growth rate. To put this into context we can conclude that this model implies that as rainfall increases, the maximum growth rate will also increase causing a greater abundance estimate.
 
-### Modelling $K$ dependent on $R_t$ and $R_{t-1}$
+## Modelling $K$ dependent on $R_t$ and $R_{t-1}$
 
 Using the same optimization methods used previously when modelling the temporal variation of $r$, we can now extend the model to include temporal variation of $k$. The two formulations of K modeled are:
 
@@ -532,7 +703,7 @@ kable(beta_values, caption = "Coefficients and model comparisons for time varyin
 
 From comparing the AIC values of the competing models in Table 2, the optimal choice appears to use $K$ as a function of $R_t$. Within this model $\beta_0 = -0.497$ and $\beta_1 = 1.02$. This positive value of $\beta_1$ implies that rain has a positive effect on the carrying capacity and so more rain will lead to a greater carrying capacity.
 
-### The Optimal Model?
+## The Optimal Model?
 
 By comparing the AIC and BIC scores of all 4 models, it would appear that the optimal model according to the lowest score is the one which uses K dependent on $R_t$ followed by the dependence of $r$ on $R_t$.
 
@@ -652,7 +823,301 @@ From Table 3 it can be seen that both the AIC and BIC for the final model are gr
 
 It can also be seen by comparison the coefficient values for the model with both $\alpha_1$ and $\beta_1$ appear to have a smaller magnitude than those of the models with only a single time varying variable suggesting that compared to the individual models the impact of rainfall on each coeffiecient has been reduced. $\alpha_1$ has now also taken a negative value implying a negative relationship between the maximum growth rate and rainfall, contradicting the observations made previously in the model with on r displaying temporal variation.
 
+------------------------------------------------------------------------
+
 \newpage
+
+# Appendix
+
+## Question 1 Code
+
+``` {r Q1append, eval = FALSE}
+
+# a)
+
+# See written report
+
+# b)
+
+# Write an R script to simulate dynamics from this model.
+# we do this in a function.
+
+# INPUT : 
+# n0 = initial populations
+# phi = survival probabilities
+# rho = reproduction rates
+# p = probability of detection
+# nyears = number of years over which population is projected
+# PROCESS : 
+# calculate the stochastic population dynamics and observations for each year
+# OUTPUT :
+# y = array of observations for each year, across all age classes
+# n = array of abundances for each year, across all age classes
+
+BAS_stoch <- function(n0, phi, rho, p, nyears) {
+  
+  # initialise
+  
+  # matrix of all abundances, each column is a year, row is age class
+  n <- matrix(data = NA, nrow = length(n0), ncol = (nyears+1))
+  
+  # matrix of all observations
+  y <- n #replicate n
+  
+  # initial abundance
+  # let the first set of abundances (at t = 0) be the initial population size
+  n[,1] <- n0
+  
+  # initial observation
+  # ASSUMPTION: binomial distribution as constant probability of detection (see Newman)
+  y[1,1] <- rbinom(n = 1, size = n[1,1], prob = p)
+  y[2,1] <- rbinom(n = 1, size = n[2,1], prob = p)
+  y[3,1] <- rbinom(n = 1, size = n[3,1], prob = p)
+  y[4,1] <- rbinom(n = 1, size = n[4,1], prob = p)
+  
+  # loop over all (other) years
+  for (i in 2:(nyears+1)) {
+    
+    # calculate stochastic sub-processes for BAS model
+    
+    # Survival process
+    u_1s1t <- rbinom(n = 1, size = n[1,i-1], prob = phi[1])
+    u_1s2t <- rbinom(n = 1, size = n[2,i-1], prob = phi[2])
+    u_1s3t <- rbinom(n = 1, size = n[3,i-1], prob = phi[3])
+    u_1s4t <- 0
+    
+    # Ageing process
+    u_2a1t <- 0
+    u_2a2t <- u_1s1t
+    u_2a3t <- u_1s2t
+    u_2a4t <- u_1s3t + u_1s4t
+    
+    # Reproduction/Birth process
+    u_3b1t <- rpois(n = 1, lambda = rho[1] * u_2a2t) + 
+              rpois(n = 1, lambda = rho[2] * u_2a3t)
+    u_3b2t <- u_2a2t
+    u_3b3t <- u_2a3t
+    u_3b4t <- u_2a4t
+    
+    # new abundances
+    n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
+    
+    # new observations
+    y[1,i] <- rbinom(n = 1, size = n[1,i], prob = p)
+    y[2,i] <- rbinom(n = 1, size = n[2,i], prob = p)
+    y[3,i] <- rbinom(n = 1, size = n[3,i], prob = p)
+    y[4,i] <- rbinom(n = 1, size = n[4,i], prob = p)
+  }
+  
+  # return
+  return(list(n=n,y=y))
+  
+}
+
+# parameters from specification
+phi <- c(0.45, 0.7, 0.7)
+rho <- c(0.9, 1.9)
+p <- 0.5
+n0 <- c(150, 70, 50, 30)
+
+# c)
+
+# Simulate 25 years of age-specific population dynamics and observations and 
+# produce an informative visualisation of the data.
+
+# specify how many years to project over
+nyears <- 25
+
+# run function for 25 years
+BAS_proj <- BAS_stoch(n0 = n0, phi = phi, rho = rho, p = p, nyears = nyears)
+
+# visualise the data using a faceted ggplot.
+
+# convert both outputs to dataframes
+proj_n_df <- as.data.frame( cbind(0:nyears, t(BAS_proj$n), 
+                    rep(2,(nyears+1))) )
+proj_y_df <- as.data.frame( cbind(0:nyears, t(BAS_proj$y), 
+                    rep(1,(nyears+1))) )
+
+# rename
+colnames(proj_n_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+colnames(proj_y_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+
+# pivot longer
+proj_n_df_long <- pivot_longer(data = proj_n_df, 
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
+proj_y_df_long <- pivot_longer(data = proj_y_df, 
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
+proj_df_long <- rbind(proj_n_df_long, proj_y_df_long)
+colnames(proj_df_long) <- c("Year", "State", "Age Class", "Abundance")
+
+# change variable types
+proj_df_long$State <- as.factor(proj_df_long$State)
+proj_df_long$`Age Class` <- as.factor(proj_df_long$`Age Class`)
+
+# Can now easily use faceted ggplot
+plot_BAS <- ggplot(data = proj_df_long, aes(x = Year, y = Abundance)) + 
+  geom_line(aes(colour = State), size = 1) +
+  scale_colour_manual("State", breaks = c(2, 1),
+                      values = c("blue", "grey"), 
+                      labels = c("Dynamics","Observations")) +
+  facet_wrap(~factor(`Age Class`, levels = c("First Year Individuals", 
+                                             "Second Year Individuals", 
+                                             "Third Year Individuals", 
+                                             "Fourth Year Individuals")), 
+             scales = "free_y") +
+  ylab("Abundance") +
+  ggtitle("Population Dynamics and Observations Projected over Time")
+plot_BAS
+
+# Extension to part b) and c)
+
+# Create a new function like in b), but runs poisson instead of Binomial for 
+# observations
+
+# INPUT : 
+# n0 = initial populations
+# phi = survival probabilities
+# rho = reproduction rates
+# p = probability of detection
+# nyears = number of years over which population is projected
+# PROCESS : 
+# calculate the stochastic population dynamics and observations for each year
+# OUTPUT :
+# y = array of observations for each year, across all age classes
+# n = array of abundances for each year, across all age classes
+
+BAS_extension <- function(n0, phi, rho, p, nyears) {
+  
+  # initialise
+  
+  # matrix of all abundances, each column is a year, row is age class
+  n <- matrix(data = NA, nrow = length(n0), ncol = (nyears+1))
+  
+  # matrix of all observations
+  y <- n #replicate n
+  
+  # initial abundance
+  # let the first set of abundances (at t = 0) be the initial population size
+  n[,1] <- n0
+  
+  # initial observation
+  y[1,1] <- rpois(n = 1, lambda = n[1,1]*p)
+  y[2,1] <- rpois(n = 1, lambda = n[2,1]*p)
+  y[3,1] <- rpois(n = 1, lambda = n[3,1]*p)
+  y[4,1] <- rpois(n = 1, lambda = n[4,1]*p)
+  
+  # loop over all (other) years
+  for (i in 2:(nyears+1)) {
+    
+    # calculate stochastic sub-processes for BAS model
+    
+    # Survival process
+    u_1s1t <- rbinom(n = 1, size = n[1,i-1], prob = phi[1])
+    u_1s2t <- rbinom(n = 1, size = n[2,i-1], prob = phi[2])
+    u_1s3t <- rbinom(n = 1, size = n[3,i-1], prob = phi[3])
+    u_1s4t <- 0
+    
+    # Ageing process
+    u_2a1t <- 0
+    u_2a2t <- u_1s1t
+    u_2a3t <- u_1s2t
+    u_2a4t <- u_1s3t + u_1s4t
+    
+    # Reproduction/Birth process
+    u_3b1t <- rpois(n = 1, lambda = rho[1] * u_2a2t) + 
+      rpois(n = 1, lambda = rho[2] * u_2a3t)
+    u_3b2t <- u_2a2t
+    u_3b3t <- u_2a3t
+    u_3b4t <- u_2a4t
+    
+    # new abundances
+    n[,i] <- c(u_3b1t, u_3b2t, u_3b3t, u_3b4t)
+    
+    # new observations
+    y[1,i] <- rpois(n = 1, lambda = n[1,i]*p)
+    y[2,i] <- rpois(n = 1, lambda = n[2,i]*p)
+    y[3,i] <- rpois(n = 1, lambda = n[3,i]*p)
+    y[4,i] <- rpois(n = 1, lambda = n[4,i]*p)
+  }
+  
+  # return
+  return(list(n=n,y=y))
+  
+}
+
+# Simulate 25 years of age-specific population dynamics and observations and 
+# produce an informative visualisation of the data.
+
+# run function for 25 years
+# use same parameter values as above
+BAS_proj_ext <- BAS_extension(n0 = n0, phi = phi, rho = rho, p = p, 
+                              nyears = nyears)
+
+# visualise the data using a faceted ggplot.
+
+# convert both outputs to dataframes
+proj_n_df <- as.data.frame( cbind(0:nyears, t(BAS_proj_ext$n), 
+                                  rep(2,(nyears+1))) )
+proj_y_df <- as.data.frame( cbind(0:nyears, t(BAS_proj_ext$y), 
+                                  rep(1,(nyears+1))) )
+
+# rename
+colnames(proj_n_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+colnames(proj_y_df) <- c("Year", "First Year Individuals", 
+                         "Second Year Individuals", 
+                         "Third Year Individuals", 
+                         "Fourth Year Individuals", "State")
+
+# pivot longer
+proj_n_df_long <- pivot_longer(data = proj_n_df, 
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
+proj_y_df_long <- pivot_longer(data = proj_y_df, 
+                               cols = c("First Year Individuals", 
+                                        "Second Year Individuals", 
+                                        "Third Year Individuals", 
+                                        "Fourth Year Individuals"))
+proj_df_long <- rbind(proj_n_df_long, proj_y_df_long)
+colnames(proj_df_long) <- c("Year", "State", "Age Class", "Abundance")
+
+# change variable types
+proj_df_long$State <- as.factor(proj_df_long$State)
+proj_df_long$`Age Class` <- as.factor(proj_df_long$`Age Class`)
+
+# Can now easily use faceted ggplot
+plot_BAS_ext <- ggplot(data = proj_df_long, aes(x = Year, y = Abundance)) + 
+  geom_line(aes(colour = State), size = 1) +
+  scale_colour_manual("State", breaks = c(2, 1),
+                      values = c("blue", "grey"), 
+                      labels = c("Dynamics","Observations")) +
+  facet_wrap(~factor(`Age Class`, levels = c("First Year Individuals", 
+                                             "Second Year Individuals", 
+                                             "Third Year Individuals", 
+                                             "Fourth Year Individuals")), 
+             scales = "free_y") +
+  ylab("Abundance") +
+  ggtitle("Population Dynamics and Observations Projected over Time")
+plot_BAS_ext
+
+```
 
 ## Question 3 Code
 
