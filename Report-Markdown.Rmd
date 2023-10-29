@@ -5,14 +5,11 @@ date: "`r Sys.Date()`"
 output: 
   pdf_document:
     fig_caption: yes
-    extra_dependencies: ["float"]
 bibliography: MT5767Project1.bib
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#fully stop floating images; surprisingly, this does not introduce any issues but must be done sparingly and checked often
-knitr::opts_chunk$set(fig.pos = "H", out.extra = "") 
 ```
 
 ```{r load and set, include = FALSE}
@@ -502,11 +499,11 @@ Keeping $r_t$ and $K_t$ dependent on rainfall $R_t$ as specified above, we explo
 
 $N_t = (N_{t-1} - c_{t-1})+r_t(N_{t-1} - c_{t-1})\bigg(1-\frac{(N_{t-1} - c_{t-1})}{K_t}\bigg)$
 
-From Figure \ref{fig:2aplot}, both specifications appear fairly close but demonstrate minor divergence when removals begin in 1977. Before 1984, the Removals First model generates a lower abundance estimate compared to Removals Last; those flip for the final two time points. While most data points are fit well, neither model matches the population decrease in 1978 from 1977, but the higher value from the Removals Last formulation aptly encapsulates the population decrease between 1978 and 1982 at the cost of less smooth dynamics.
+Both specifications appear fairly close but demonstrate minor divergence when removals begin in 1977. Before 1984, the Removals First model generates a lower abundance estimate compared to Removals Last; those flip for the final two time points. While most data points are fit well, neither model matches the population decrease in 1978 from 1977, but the higher value from the Removals Last formulation aptly encapsulates the population decrease between 1978 and 1982 at the cost of less smooth dynamics.
 
 This is further evidenced by information criterion values that show our new Removals Last formulation (AIC = `r round(aic4, 1)`) remains superior to the Removals First (AIC = `r round(aic5, 1)`) alternative. These results support the graphical interpretation and suggest that removals are best accounted for at the end, rather than start of, a time period.
 
-```{r 2aplot, results='hide', echo=FALSE, warning=FALSE, fig.cap="\\label{fig:2aplot}A model with varying specification of removals $c_{t-1}$"}
+```{r 2aplot, results='hide', echo=FALSE, warning=FALSE, fig.cap="A model with varying specification of removals $c_{t-1}$"}
 gpreds
 ```
 
