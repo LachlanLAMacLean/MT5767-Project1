@@ -471,7 +471,7 @@ Both specifications appear fairly close but demonstrate minor divergence when re
 
 This is further evidenced by information criterion values that show our new Removals Last formulation (AIC = `r round(aic4, 1)`) remains superior to the Removals First (AIC = `r round(aic5, 1)`) alternative. These results support the graphical interpretation and suggest that removals are best accounted for at the end, rather than start of, a time period.
 
-```{r 2aplot, results='hide', echo=FALSE, warning=FALSE, fig.cap="A model with varying specification of removals $c_{t-1}$"}
+```{r 2aplot, out.height="90%", out.width="90%", fig.align="center", results='hide', echo=FALSE, warning=FALSE, fig.cap="A model with varying specification of removals $c_{t-1}$"}
 gpreds
 ```
 
