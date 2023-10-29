@@ -22,6 +22,7 @@ library(statsecol)
 str(wildebeest)
 library(gridExtra)
 library(knitr)
+library(stats)
 
 # Set seed for reproducibility
 set.seed(576711)
@@ -509,7 +510,11 @@ gpreds
 
 ## Parts b) and c)
 
-The justification for modelling $r_t$ and $K_t$ concerns the basics of plant-herbivore trophic interactions: wildebeest abundance is a function of their access to food, which in turn depends on climate factors like rainfall. The former parameter $r_t$ from the deterministic dynamics suggests that the rate of geometric growth in current year $t$ is a function of rainfall in the current year. Alternatively, could it be a function of rainfall in previous year $t-1$? Carrying capacity $K_t$, though representing the maximum possible population, can be discussed in parallel since the drivers of suitable formulation strategies are largely the same. $r_t$ represents how much wildebeest abundance changes (as a geometric factor) between times $t-1$ and $t$; $K_t$ describes the maximum abundance of wildebeest in time $t$. Like most time-dependent variables, there is an inevitable degree of (serial auto)correlation between values in times $t-1$ and $t$ for $r$, $K$, and $R$. But which formulation is the best measure of actual population dynamics? Ultimately, the same factors that drive population growth drive the carrying capacity: $r$ simply accounts for actual abundance in time $t-1$ while $K$ does not. Nonetheless, the drivers of both parameters and their relationship with rainfall are quite similar.
+The justification for modelling $r_t$ and $K_t$ concerns the basics of plant-herbivore trophic interactions: wildebeest abundance is a function of their access to food, which in turn depends on climate factors like rainfall. The former parameter $r_t$ from the deterministic dynamics suggests that the rate of geometric growth in current year $t$ is a function of rainfall in the current year. Alternatively, could it be a function of rainfall in previous year $t-1$? Carrying capacity $K_t$, though representing the maximum possible population, can be discussed in parallel since the drivers of suitable formulation strategies are largely the same. $r_t$ represents how much wildebeest abundance changes (as a geometric factor) between times $t-1$ and $t$; $K_t$ describes the maximum abundance of wildebeest in time $t$. Like most time-dependent variables, there is an inevitable degree of (serial auto)correlation between values in times $t-1$ and $t$ for rainfall $R$. But which formulation is the best measure of actual population dynamics? Ultimately, the same factors that drive population growth drive the carrying capacity: $r$ simply accounts for actual abundance in time $t-1$ while $K$ does not. While this would differ if we specified K as a time-variant function of grazing by the existing population in $t-1$ (affecting food availability in time $t$), the drivers of both parameters and their relationship with rainfall under this model are quite similar.
+
+```{r 2aplot2, out.height="70%", out.width="70%", fig.align="center", results='hide', echo=FALSE, warning=FALSE, fig.cap="High autocorrelation in first lag of Serengeti rainfall", }
+acf(wildebeest$rain, main = "", xlab = "Lag of rainfall", ylab = "Autocorrelation")
+```
 
 If wildebeest abundance has some fixed relationship to the amount of available food (grass), this discussion hinges on the relationship between rainfall and grass growth in the Serengeti: does grass grow more strongly in response to rain in a given year, or is there a lagged relationship? The lagged relationship could arise from a multitude of factors: water table saturation, soil properties, or changes in local population water use affecting the ecosystem. If possible, we would want to consult the literature; however, the bulk of anthropogenic and climate research in the Serengeti starts from the 1990s onwards. Unfortunately, we cannot assume that climate trends are comparable across time given the sheer scale of anthropogenic climate change. 
 
@@ -1286,7 +1291,7 @@ plot_BAS_ext
 ## Question 2 Code
 ``` {r Q2append, eval = FALSE, include = TRUE}
 
-#repurposed general solution from Practical 5 to generate original rainfall-dependent model
+#repurposed solution from Practical 5 to generate original rainfall-dependent model
 rain_rK_nll <- function(pars, years, removals, Nhat, SEhat, rain, type="nll"){
   
   #exponentiate values to match log-likelihood optimisation
@@ -1373,7 +1378,7 @@ rain_rK_nll_alt <- function(pars, years, removals, Nhat, SEhat, rain, type="nll"
   if(type=="proj"){ return(N)}
 }
 
-#fit the removals first model in the same fashion using previously-defined initial parameters
+#fit the removals first model in the same fashion using some initial parameters
 fit_5 <- optim(par = c(log(0.1),log(0.25),0,log(1.5),0), fn = rain_rK_nll_alt, years = yrs, 
                removals = rmv, Nhat = Nhat, SEhat = SEhat, rain = rain)
 
@@ -1401,8 +1406,11 @@ gpreds <- ggplot(wildebeest, aes(x=year, y=Nhat)) +
   ggtitle("Population models accounting for illegal harvesting") + 
   theme_bw()
 
-#display plot
+#display plot of model results
 gpreds
+
+#add an autocorrelation plot just show that there will be information overlap between t = 0 and 1
+acf(wildebeest$rain, main = "", xlab = "Lag of rainfall", ylab = "Autocorrelation")
 
 ```
 ## Question 3 Code
