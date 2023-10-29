@@ -289,10 +289,10 @@ Given the prescribed BAS model for this question, we first look at the potential
 
 Next we look at the ageing sub-process. As all animals must necessarily age between time periods (years), we know this must be a deterministic process where all individuals from the previous sub-process for each age class move into to the next age class. We know the final fourth year individuals all die during the year (as per the previous survival sub-process) and thus do not move to a higher age class. 
 
-Finally for reproduction, we choose a Poisson distribution for the first sub-process age class, whilst keeping all other age classes the same as in the previous sub process. *Two* poisson distributions contribute to this first age-class reproduction abundance; the first is the reproduction contribution of the second age-class individuals, and the second is the reproduction contribution of the third age-class individuals. The rate parameters are $\lambda = \rho \cdot u_{2(a),i,t}$, where $u_{2(a),i,t}$ is the ageing sub-process abundances for age class individuals $i = 2,3$, at time $t$. A Poisson distribution is chosen as this is one of the established relevant distributions for ageing and we know one of the reproduction rates is greater than 1 ($\rho_3 = 1.9$) so a binomial distribution is not appropriate (Reference to Newman chapter 2).
+Finally for reproduction, we choose a Poisson distribution for the first sub-process age class, whilst keeping all other age classes the same as in the previous sub process. *Two* poisson distributions contribute to this first age-class reproduction abundance; the first is the reproduction contribution of the second age-class individuals, and the second is the reproduction contribution of the third age-class individuals. The rate parameters are $\lambda = \rho \cdot u_{2(a),i,t}$, where $u_{2(a),i,t}$ is the ageing sub-process abundances for age class individuals $i = 2,3$, at time $t$. A Poisson distribution is chosen as this is one of the established relevant distributions for ageing and we know one of the reproduction rates is greater than 1 ($\rho_3 = 1.9$) so a binomial distribution is not appropriate [@MPD_Newman_2014].
 
 
-The other stochastic component of this model are the observations. Given we are told the probability of detection is a static $p = 0.5$ and that no double counting can occur, a binomial distribution for the observations of each age class seems appropriate (Reference to chapter 7/8 of notes). Here we use the abundance for class $i$ at time $t$, $n_{i,t}$, for the number of trials and $p = 0.5$ for the probability of success.
+The other stochastic component of this model are the observations. Given we are told the probability of detection is a static $p = 0.5$ and that no double counting can occur, a binomial distribution for the observations of each age class seems appropriate, as confirmed in chapters 7 and 8 of the course notes. Here we use the abundance for class $i$ at time $t$, $n_{i,t}$, for the number of trials and $p = 0.5$ for the probability of success.
 
 ## Part b)
 
@@ -302,27 +302,27 @@ In this part we functionalise the theory from a) in order to simulate the dynami
 
 Finally, we run the function, projecting the animal abundance over 25 years. Storing the values for the population dynamics and observations, we then convert this into an appropriate format. This data can then be used to produce clear visualisations in the form of line plots.
 
-```{r Q1c, eval = TRUE, fig.cap = 'Population dynamics and observations over time given a binomial distribution for the observations', echo = FALSE}
+```{r Q1c, eval = TRUE, fig.cap = 'Population dynamics and observations over time given a binomial distribution for the observations.', echo = FALSE}
 
 plot_BAS
 
 ```
 
-From this graph we see a general downward trend over the 25 years the population dynamics have been projected. This is consistent across the four age classes. The stochastic nature of the model is elucidated in the oscillatory nature of each population dynamic line. For reproducibility purposes we have set the seed at the beginning of the code. Looking at the observations, using this binomial distribution with the number of trials being the abundance at each time, and the probability of success always being $50%$, these lines - predictably - are lower than the actual population dynamics. Again, using a static success probability means that the shape of these observation curves are likely to follows those of their respective dynamics curves, as is seen here.
+From this graph we see a general downward trend over the 25 years the population dynamics have been projected. This is consistent across the four age classes. The stochastic nature of the model is elucidated in the oscillatory behaviour of each population dynamic line. For reproducibility purposes we have set the seed at the beginning of the code. Looking at the observations, using this binomial distribution with the number of trials being the abundance at each time, and the probability of success always being $50\%$, these lines - predictably - are lower than the actual population dynamics. Again, using a static success probability means that the shape of these observation curves are likely to follow those of their respective dynamics curves, as is seen here.
 
 ## Extension
 
 **This is beyond the scope of the assignment.**
 
-Here, we look at differences when changing the observation distribution. Before, we chose a binomial distribution, we now change this to a poisson distribution for the observation of each age class, as the specification does allow for this type of distribution to be used. The rate parameter for each age class $i$ at time $t$ is $\lambda = n_{i,t} \cdot p$. Otherwise providing this function the same values as above, we produce another visualisation. 
+Here, we look at differences when changing the observation distribution. Before, we chose a binomial distribution, we now change this to a poisson distribution for the observation of each age class, as the specification does allow for this type of distribution to be used. The rate parameter for each age class $i$ at time $t$ is $\lambda = n_{i,t} \cdot p$. Using the population dynamics values calculated before, we produce another visualisation. 
 
-``` {r Q1ext, eval = TRUE, fig.cap = 'Population dynamics and observations over time given a binomial distribution for the observations', echo = FALSE}
+``` {r Q1ext, eval = TRUE, fig.cap = 'Population dynamics and observations over time given a poisson distribution for the observations.', echo = FALSE}
 
 plot_BAS_ext
 
 ```
 
-Here we only comment on the difference in observations from the previous graph. These observations appear to reasonably explain the given specifications. However, we see in the line for the Fourth Year Individuals that it exceeds the population dynamics line in the twelfth year. Given that we are told to use a "[detection] probability of p=0.5 and no double counting", this does not seem like as good model a model as the binomial distribution. We encounter this as the poisson distribution has no explicit upper bound and so a value such as this, however unlikely, can be obtained. Whereas the binomial distribution is bounded by the number of trials (in our case the abundance for class $i$ at time $t$). We conclude that the binomial distribution must be a better model for the observations than the poisson distribution.
+Here we only comment on the difference in observations from the previous graph. These observations appear to reasonably explain the given specifications. However, we see in the line for the Fourth Year Individuals that it exceeds the population dynamics line in the twelfth year. Given that we are told to use a "[detection] probability of $p=0.5$ and no double counting", this does not seem like as good a model as the binomial distribution. We encounter this as the poisson distribution has no explicit upper bound and so a value such as this, however unlikely, can be obtained. Whereas, the binomial distribution is bounded by the number of trials (in our case the abundance for class $i$ at time $t$). We conclude that the binomial distribution must be a better model for the observations than the poisson distribution.
 
 ------------------------------------------------------------------------
 
