@@ -5,11 +5,14 @@ date: "`r Sys.Date()`"
 output: 
   pdf_document:
     fig_caption: yes
+    extra_dependencies: ["float"]
 bibliography: MT5767Project1.bib
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#fully stop floating images; surprisingly, this does not introduce any issues but must be done sparingly and checked often
+knitr::opts_chunk$set(fig.pos = "H", out.extra = "") 
 ```
 
 ```{r load and set, include = FALSE}
@@ -513,7 +516,7 @@ The justification for modelling $r_t$ and $K_t$ concerns the basics of plant-her
 
 This discussion hinges on the relationship between rainfall and grass growth in the Serengeti: does grass grow more strongly in response to rain in a given year, or is there a lagged relationship? The lagged relationship could arise from a multitude of factors: water table saturation, soil properties, or changes in local population water use affecting the ecosystem. If possible, we would want to consult the literature; however, the bulk of anthropogenic and climate research in the Serengeti starts from the 1990s onwards. As is now considered common knowledge among climate scientists (because it limits our ability to conduct such inferences), we cannot assume that climate trends are comparable across time given the sheer scale of anthropogenic climate change. 
 
-One of the rare studies using measurements concurrent with our data suggests that the $t$ formulation is more appropriate than $t-1$: years prior to 1990 show minimal extreme, extended multi-year drought (where lagged correlations become relevant). As migratory ungulates, wildebeest also respond to rainfall by spatially relocating across the study area---moving towards suitable habitats. Thus, a lagged relationship requires that wildebeest would exhaust all ideal habitats and migrate to actively drought-ridden landscapes, which was not observed. With rainfall further showing heavy spatial variation, inter-year correlation between our Serengeti-wide rainfall measures will likely be minimal. Interestingly, highly saturated pools of water are quite common in the area but may present mixed effects---as vectors of wildlife disease, their specific benefits or harms to wildebeest populations (including the direction of this effect) remains unclear. Thus, we can say little about periods of extended rain in contrast to clearer impacts of drought. [@wolanski_water_2001] 
+One of the rare studies using measurements concurrent with our data suggests that the $t$ formulation is more appropriate than $t-1$: years prior to 1990 show minimal extreme, extended multi-year drought (where lagged correlations become relevant). As migratory ungulates, wildebeest also respond to rainfall by spatially relocating across the study area---moving towards suitable habitats. Thus, a lagged relationship requires that wildebeest would exhaust all ideal habitats and migrate to actively drought-ridden landscapes, which was not observed but would have impacted $K_t$. With rainfall further showing heavy spatial variation, our Serengeti-wide rainfall measures will not display an especially informative relationship with deterministic model parameters. Interestingly, highly saturated pools of water are quite common in the area but may present mixed effects---as vectors of wildlife disease, their specific benefits or harms to wildebeest populations (including the direction of this effect) remains unclear. Thus, we can say little about periods of extended rain in contrast to clearer impacts of drought. [@wolanski_water_2001] 
 
 As a result, formulations of $r_t$ and $K_t$ may best remain as a function of rainfall $R_t$ rather than $R_{t-1}$. Depending on specific trends of spatial migration strategies, an $R_{t-1}$ specification may be suitable only for carrying capacity $K_t$ but only in tandem with current year rainfall $R_t$. The quantitative implications of both approaches are empirically tested in the following Question 3 using between-model comparisons in the following section. Alternative approaches that test the explicit predictive of $R_t$ and $R_{t-1}$ by simultaneously including both in a single model to compare predictive power are feasible but left out-of-scope for this report. 
 
@@ -523,7 +526,7 @@ As a result, formulations of $r_t$ and $K_t$ may best remain as a function of ra
 
 We will fit models to the data using values for growth rate, $r$, and carrying capacity, $K$, dependent on the recorded rainfall, $R,$ according to the data set. We will then look to test the impact of time lag when fitting models to the observed data by finding the coefficients of $r$ and $K$ with respect to $R_t$ and $R_{t-1}$.
 
-## modelling $r$ dependent on $R_t$ and $R_{t-1}$
+## Modelling $r$ dependent on $R_t$ and $R_{t-1}$
 
 The previously used model has now been extended to include temporal variation in $r$:
 
