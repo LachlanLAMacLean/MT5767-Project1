@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output: 
   pdf_document:
     fig_caption: yes
+bibliography: MT5767Project1.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -506,13 +507,15 @@ This is further evidenced by information criterion values that show our new Remo
 gpreds
 ```
 
-## Part b)
+## Parts b) and c)
 
+The justification for modelling $r_t$ and $K_t$ concerns the basics of plant-herbivore trophic interactions: wildebeest abundance is a function of their access to food, which in turn depends on climate factors like rainfall. The former parameter $r_t$ from the deterministic dynamics suggests that the rate of geometric growth in current year $t$ is a function of rainfall in the current year. Alternatively, could it be a function of rainfall in previous year $t-1$? Carrying capacity $K_t$, though representing the maximum possible population, can be discussed in parallel since the drivers of suitable formulation strategies are largely the same.
 
+This discussion hinges on the relationship between rainfall and grass growth in the Serengeti: does grass grow more strongly in response to rain in a given year, or is there a lagged relationship? The lagged relationship could arise from a multitude of factors: water table saturation, soil properties, or changes in local population water use affecting the ecosystem. If possible, we would want to consult the literature; however, the bulk of anthropogenic and climate research in the Serengeti starts from the 1990s onwards. As is now considered common knowledge among climate scientists (because it limits our ability to conduct such inferences), we cannot assume that climate trends are comparable across time given the sheer scale of anthropogenic climate change. 
 
-## Part c)
+One of the rare studies using measurements concurrent with our data suggests that the $t$ formulation is more appropriate than $t-1$: years prior to 1990 show minimal extreme, extended multi-year drought (where lagged correlations become relevant). As migratory ungulates, wildebeest also respond to rainfall by spatially relocating across the study area---moving towards suitable habitats. Thus, a lagged relationship requires that wildebeest would exhaust all ideal habitats and migrate to actively drought-ridden landscapes, which was not observed. With rainfall further showing heavy spatial variation, inter-year correlation between our Serengeti-wide rainfall measures will likely be minimal. Interestingly, highly saturated pools of water are quite common in the area but may present mixed effects---as vectors of wildlife disease, their specific benefits or harms to wildebeest populations (including the direction of this effect) remains unclear. Thus, we can say little about periods of extended rain in contrast to clearer impacts of drought. [@wolanski_water_2001] 
 
-
+As a result, formulations of $r_t$ and $K_t$ may best remain as a function of rainfall $R_t$ rather than $R_{t-1}$. Depending on specific trends of spatial migration strategies, an $R_{t-1}$ specification may be suitable only for carrying capacity $K_t$ but only in tandem with current year rainfall $R_t$. The quantitative implications of both approaches are empirically tested in the following Question 3 using between-model comparisons in the following section. Alternative approaches that test the explicit predictive of $R_t$ and $R_{t-1}$ by simultaneously including both in a single model to compare predictive power are feasible but left out-of-scope for this report. 
 
 ------------------------------------------------------------------------
 
@@ -1279,15 +1282,7 @@ plot_BAS_ext
 ```
 
 ## Question 2 Code
-
 ``` {r Q2append, eval = FALSE, include = TRUE}
-
-install.packages("remotes")
-library(remotes)
-remotes::install_github("chrissuthy/statsecol")
-library(statsecol)
-str(wildebeest)
-library(tidyverse)
 
 #repurposed general solution from Practical 5 to generate original rainfall-dependent model
 rain_rK_nll <- function(pars, years, removals, Nhat, SEhat, rain, type="nll"){
@@ -1401,14 +1396,13 @@ gpreds <- ggplot(wildebeest, aes(x=year, y=Nhat)) +
   geom_point(size=3) +
   geom_line(data=pred_df_full, aes(x=years,y=N,color=Model,group=Model),linewidth=0.8) +
   ylim(0,2.1) + ylab("Abundance (millions)") + xlab("Year") +
-  ggtitle("Population models with varying order of removals from illegal harvesting") + 
+  ggtitle("Population models accounting for illegal harvesting") + 
   theme_bw()
 
 #display plot
 gpreds
 
 ```
-
 ## Question 3 Code
 
 ```{r Q3a CODE, eval = FALSE, include=TRUE}
@@ -1855,3 +1849,6 @@ grid.arrange(plot5, ncol = 1)
 #output the datagrame as a table for analysis
 kable(combined_values, caption = "Coefficient and model comparison values")
 ```
+
+
+# References
