@@ -876,7 +876,7 @@ Comparing the value of $\beta_1$ to the previously found $\alpha_1$ it appears t
 
 By comparing the AIC and BIC scores of all 4 models, it would appear that the optimal model according to the lowest scores is that which calculates K dependent on $R_t$, followed by the model with dependence of $r$ on $R_t$.
 
-## Modelling both temporal $r$ and $K$
+## Modelling both temporal $r$ and $K$ - an extention of 3a) and 3b)
 
 From the above model comparisons it has been shown that the models perform better when using $r$ or $K$ dependent on $R_{t-1}$, but what if we calculate $r$ and $K$ as follows:
 
