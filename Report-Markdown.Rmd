@@ -31,7 +31,7 @@ set.seed(576711)
 
 # Contribution Statement
 
-This report is the joint product of all of the above mentioned members with each member producing the code, analysis and write up for separate questions. Question 1 was completed by LM, Question 2 by MT and Question 3 by LG.
+This report is the joint product of all of the above mentioned members with each member producing the code, analysis and write up for separate questions. Question 1 was completed by LM, Question 2 by MT and Question 3 by LG. Final textual and design edits were performed collaboratively, in tandem.
 
 ------------------------------------------------------------------------
 
@@ -471,13 +471,13 @@ Both specifications appear fairly close but demonstrate minor divergence when re
 
 This is further evidenced by information criterion values that show our new Removals Last formulation (AIC = `r round(aic4, 1)`) remains superior to the Removals First (AIC = `r round(aic5, 1)`) alternative. These results support the graphical interpretation and suggest that removals are best accounted for at the end, rather than start of, a time period.
 
-```{r 2aplot, out.height="90%", out.width="90%", fig.align="center", results='hide', echo=FALSE, warning=FALSE, fig.cap="A model with varying specification of removals $c_{t-1}$"}
+```{r 2aplot, out.height="95%", out.width="95%", fig.align="center", results='hide', echo=FALSE, warning=FALSE, fig.cap="A model with varying specification of removals $c_{t-1}$"}
 gpreds
 ```
 
 ## Parts b) and c)
 
-The justification for modelling $r_t$ and $K_t$ concerns the basics of plant-herbivore trophic interactions: wildebeest abundance is a function of their access to food, which in turn depends on climate factors like rainfall. The former parameter $r_t$ from the deterministic dynamics suggests that the rate of geometric growth in current year $t$ is a function of rainfall in the current year. Alternatively, could it be a function of rainfall in previous year $t-1$? Carrying capacity $K_t$, though representing the maximum possible population, can be discussed in parallel since the drivers of suitable formulation strategies are largely the same. $r_t$ represents how much wildebeest abundance changes (as a geometric factor) between times $t-1$ and $t$; $K_t$ describes the maximum abundance of wildebeest in time $t$. Like most time-dependent variables, there is an inevitable degree of (serial auto)correlation between values in times $t-1$ and $t$ for rainfall $R$. But which formulation is the best measure of actual population dynamics? Ultimately, the same factors that drive population growth drive the carrying capacity: $r$ simply accounts for actual abundance in time $t-1$ while $K$ does not. While this would differ if we specified K as a time-variant function of grazing by the existing population in $t-1$ (affecting food availability in time $t$), the drivers of both parameters and their relationship with rainfall under this model are quite similar.
+The justification for modelling $r_t$ and $K_t$ concerns the basics of plant-herbivore trophic interactions: wildebeest abundance is a function of their access to food, which in turn depends on climate factors like rainfall. The former parameter $r_t$ from the deterministic dynamics suggests that the rate of geometric growth in current year $t$ is a function of rainfall in the current year. Alternatively, could it be a function of rainfall in previous year $t-1$? Carrying capacity $K_t$, though representing the maximum long-term possible population, can be discussed in parallel since the drivers of suitable formulation strategies are largely the same. $r_t$ represents how much wildebeest abundance changes (as a geometric factor) between times $t-1$ and $t$; $K_t$ describes the maximum abundance of wildebeest in time $t$. Like most time-dependent variables, there is an inevitable degree of (serial auto)correlation between values in times $t-1$ and $t$ for rainfall $R$. But which formulation is the best measure of actual population dynamics? Ultimately, the same factors that drive population growth drive the carrying capacity: $r$ simply accounts for actual abundance in time $t-1$ while $K$ does not. While this would differ if we specified K as a time-variant function of grazing by the existing population in $t-1$ (affecting food availability in time $t$), the drivers of both parameters and their relationship with rainfall under this model are quite similar.
 
 ```{r 2aplot2, out.height="70%", out.width="70%", fig.align="center", results='hide', echo=FALSE, warning=FALSE, fig.cap="High autocorrelation in first lag of Serengeti rainfall", }
 acf(wildebeest$rain, main = "", xlab = "Lag of rainfall", ylab = "Autocorrelation")
@@ -771,7 +771,7 @@ plot3 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
-  labs(title = expression("Model with k dependent on R"[t])) +
+  labs(title = expression("Model with K dependent on R"[t])) +
   theme_bw() +
   theme(aspect.ratio = 1)
 
@@ -821,7 +821,7 @@ plot4 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
-  labs(title = expression("Model with k dependent on R"[t-1])) +
+  labs(title = expression("Model with K dependent on R"[t-1])) +
   theme_bw() +
   theme(aspect.ratio = 1)
 
@@ -1619,7 +1619,7 @@ plot3 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
-  labs(title = expression("Model with k dependent on R"[t])) +
+  labs(title = expression("Model with K dependent on R"[t])) +
   theme_bw() +
   theme(aspect.ratio = 1)
 
@@ -1673,7 +1673,7 @@ plot4 <- ggplot(tmp_wilde, aes(x=Year, y=Nproj)) +
   geom_point(aes(x=Year,y=Nhat), size=3) +
   geom_line(aes(x=Year,y=Nproj),color="blue", size=1) +
   ylim(0,2.1) + ylab("Abundance (millions)") +
-  labs(title = expression("Model with k dependent on R"[t-1])) +
+  labs(title = expression("Model with K dependent on R"[t-1])) +
   theme_bw() +
   theme(aspect.ratio = 1)
 
