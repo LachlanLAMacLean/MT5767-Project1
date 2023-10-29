@@ -669,11 +669,11 @@ grid.arrange(plot1, plot2, ncol = 2)
 kable(alpha_values, caption = "Coefficients and model comparisons for time varying r")
 ```
 
-The AIC and BIC value can be used to compare models to fnd the best fit for the data. By comparing AIC values, the first model $r = exp(\alpha_0 + \alpha_1R_t)$ is preferable as it produces the lowest value. This is also confirmed by having a lower BIC value that its competitor. Looking at the coefficient estimates we can see that $\alpha_0$ is equal to $-2.98$ which is negative. This will mean that the intercept of the r equation when there is no rainfall is less than 1. This intercept represents the baseline or minimum growth rate independent of rainfall. It is also shown for this optimal model that $\alpha_1 = 0.632$. This positive value shows that rainfall has a positive impact on the growth rate. To put this into context we can conclude that this model implies that as rainfall increases, the maximum growth rate will also increase causing a greater abundance estimate.
+The AIC and BIC value can be used to compare models to find the best fit for the data. By comparing AIC values, the first model $r = exp(\alpha_0 + \alpha_1R_t)$ is preferable as it produces the lowest value. This is also confirmed by having a lower BIC value that its competitor. Looking at the coefficient estimates we can see that $\alpha_0$ is equal to $-2.98$ which is negative. This will mean that the intercept of the r equation when there is no rainfall is less than 1. This intercept represents the baseline or minimum growth rate independent of rainfall. It is also shown for this optimal model that $\alpha_1 = 0.632$. This positive value shows that rainfall has a positive impact on the growth rate. To put this into context we can conclude that this model implies that as rainfall increases, the maximum growth rate will also increase causing a greater abundance estimate.
 
 ## Modelling $K$ dependent on $R_t$ and $R_{t-1}$
 
-Using the same optimization methods used previously for modelling the temporal variation of $r$, we can now extend the model to include temporal variation of $K$. The two formulations of K modeled are:
+Using the same optimization methods used previously for modelling the temporal variation of $r$, we can now extend the model to include temporal variation of $K$. The two formulations of K modelled are:
 
 $K = exp(\beta_0 + \beta_1R_t)$
 
@@ -956,7 +956,7 @@ kable(combined_values, caption = "Coefficient and model comparison values")
 
 From Table 3 it can be seen that both the AIC and BIC for the final model are greater than the models using only a single variable dependent on Rainfall. This would suggest that there is no immediate benefit to using a more complex model utilising multiple non constant coefficients.
 
-It can also be seen by comparison that the coefficient values for the model with both $\alpha_1$ and $\beta_1$ appear to have a smaller magnitude than those of the models with only a single time varying variable suggesting that compared to the individual models the impact of rainfall on each coeffiecient has been reduced. $\alpha_1$ has now also taken a negative value implying a negative relationship between the maximum growth rate and rainfall, contradicting the observations made previously in the model with only r displaying temporal variation.
+It can also be seen by comparison that the coefficient values for the model with both $\alpha_1$ and $\beta_1$ appear to have a smaller magnitude than those of the models with only a single time varying variable suggesting that compared to the individual models the impact of rainfall on each coefficient has been reduced. $\alpha_1$ has now also taken a negative value implying a negative relationship between the maximum growth rate and rainfall, contradicting the observations made previously in the model with only r displaying temporal variation.
 
 ------------------------------------------------------------------------
 
